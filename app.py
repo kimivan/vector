@@ -102,8 +102,6 @@ with st.container(border=True):
     st.markdown(f"**TARGET:** Board {int(round(arrow_val))}")
     st.markdown(f"**SLIDE POSITION:** Board {int(round(slide_num))}")
 
-# FIXED: Removed the st.markdown("---") that was right here
-
 # Compact visual graph path map
 st.markdown("### 🗺️ VISUAL PATH MAP")
 st.pyplot(fig_asset, width="content")
@@ -123,9 +121,11 @@ if dist_val < 60:
             alt_pins = (alt_slope * 60) + alt_intercept
             alt_slide = alt_intercept + offset_val
             
-            pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{alt_pins:.1f}"
+            pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{int(round(alt_pins))}"
+            
+            # FIXED: Removed 'Base +X' format and forced clean integer rounding on targets
             table_data.append({
-                "Target Line": f"Base +{step} ({alt_arrow:.1f})",
+                "Target Line": f"{int(round(alt_arrow))}",
                 "Slide Stand": f"Board {int(round(alt_slide))}",
                 "Focal Pin": pin_label
             })
