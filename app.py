@@ -23,7 +23,7 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ball_y = np.linspace(foul_line, pins_dist, 100)
     ball_x = slope * ball_y + intercept
 
-    fig, ax = plt.subplots(figsize=(5, 9))
+    fig, ax = plt.subplots(figsize=(4.5, 7.5)) # Slightly narrowed for vertical mobile screens
     ax.set_aspect(3.0, adjustable='box')
     
     # Lane elements
@@ -63,74 +63,81 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     plt.tight_layout()
     return calculated_slide_board, ball_at_pins, fig
 
-# 2. STREAMLIT USER INTERFACE LAYOUT
-st.title("🎳 Bowling Vector Calculator")
+# 2. MOBILE-FIRST UI LAYOUT
+st.title("🎳 Vector Calculator")
 
-# Sidebar for Inputs (keeps the layout clean on smartphones)
-st.sidebar.header("📥 INPUTS")
-arrow_val = st.sidebar.number_input('Target Arrow:', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
-dist_val = st.sidebar.number_input('BP Dist:', min_value=16, max_value=60, value=44, step=1)
-board_val = st.sidebar.number_input('BP Board:', min_value=-5.0, max_value=45.0, value=7.0, step=0.1)
-offset_val = st.sidebar.number_input('Offset:', min_value=0.0, max_value=25.0, value=10.0, step=0.5)
+# Put inputs inside a clean collapsible expander right on the main page 
+# (Easier to tap on mobile than opening the sidebar drawer)
+with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
+    arrow_val = st.number_input('Target Arrow:', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
+    dist_val = st.number_input('BP Dist:', min_value=16, max_value=60, value=44, step=1)
+    board_val = st.number_input('BP Board:', min_value=-5.0, max_value=45.0, value=7.0, step=0.1)
+    offset_val = st.number_input('Offset:', min_value=0.0, max_value=25.0, value=10.0, step=0.5)
 
-# Calculate Core Metrics
+# Calculate Engine Metrics
 slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, offset_val)
 
-# Main UI Columns (Chart on left/top, results on right/bottom)
-col_graph, col_results = st.columns([1.2, 1])
+st.markdown("### 📋 TARGET RESULTS")
 
-with col_graph:
-    st.pyplot(fig_asset)
-    plt.close(fig_asset)
-
-with col_results:
-    st.subheader("📋 RESULTS")
-    
-    # Focal Point Output text styling
+# High-visibility row for your primary phone view metrics
+metric_col1, metric_col2 = st.columns(2)
+with metric_col1:
     if pins_num < 0.5 or pins_num > 39.5:
-        st.markdown(f"🔴 **❌ FOCAL POINT:** Board {pins_num:.1f}")
+        st.metric(label="❌ FOCAL POINT", value=f"Gutter ({pins_num:.1f})")
     else:
-        st.markdown(f"🟢 **🎳 FOCAL POINT:** Board {pins_num:.1f}")
-        
-    st.markdown(f"🟣 **📍 BREAKPOINT:** Board {board_val:.1f}")
-    st.markdown(f"🔵 **🎯 TARGET:** Board {int(round(arrow_val))}")
-    st.markdown(f"🟠 **🎯 SLIDE:** Board {int(round(slide_num))}")
-    
-    st.markdown("---")
-    
-    # Spare adjustments logic
-    st.subheader("🎳 Next line adjustments")
-    if dist_val < 60:
-        matrix_html = '<div style="font-family: monospace; line-height: 1.6; font-size: 12px;">'
-        for step in range(1, 5):
-            alt_arrow = arrow_val + step
-            if alt_arrow <= 39.5:
-                alt_slope = (board_val - alt_arrow) / (dist_val - 15)
-                alt_intercept = alt_arrow - (alt_slope * 15)
-                alt_pins = (alt_slope * 60) + alt_intercept
-                alt_slide = alt_intercept + offset_val
-                
-                color = "darkred" if (alt_pins < 0.5 or alt_pins > 39.5) else "black"
-                label_suffix = f" (+{step})"
-                
-                matrix_html += (
-                    f"🎯 Target: <span style='color:blue;'>{alt_arrow:4.1f}</span>{label_suffix:<5} | "
-                    f"👟 Slide: <span style='color:orange;'>{int(round(alt_slide)):2d}</span> | "
-                    f"🏁 Focal Point: <span style='color:{color}; font-weight:bold;'>B {alt_pins:.1f}</span><br>"
-                )
-        matrix_html += '</div>'
-        st.html(matrix_html)
-    else:
-        st.markdown("`None`")
-        
-    st.markdown("---")
-    
-    # Constant Pin Deck Reference Panel
-    st.subheader("📋 PIN REFERENCE (60 FT)")
-    st.html("""
-    <div style="font-family: monospace; line-height: 1.5; font-size: 13px;">
-      <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
-      <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
-      <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
-    </div>
-    """)
+        st.metric(label="🎳 FOCAL POINT", value=f"Board {pins_num:.1f}")
+with metric_col2:
+    st.metric(label="👟 STANDING SLIDE", value=f"Board {int(round(slide_num))}")
+
+# Secondary metrics row below it
+metric_col3, metric_col4 = st.columns(2)
+with metric_col3:
+    st.markdown(f"🟣 **Breakpoint Target:** Board {board_val:.1f}")
+with metric_col4:
+    st.markdown(f"🔵 **Target Arrow:** Board {int(round(arrow_val))}")
+
+st.markdown("---")
+
+# Spare adjustments panel (Visible immediately on mobile scroll)
+st.markdown("### 🎳 Next line adjustments")
+if dist_val < 60:
+    matrix_html = '<div style="font-family: monospace; line-height: 1.8; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">'
+    for step in range(1, 5):
+        alt_arrow = arrow_val + step
+        if alt_arrow <= 39.5:
+            alt_slope = (board_val - alt_arrow) / (dist_val - 15)
+            alt_intercept = alt_arrow - (alt_slope * 15)
+            alt_pins = (alt_slope * 60) + alt_intercept
+            alt_slide = alt_intercept + offset_val
+            
+            color = "darkred" if (alt_pins < 0.5 or alt_pins > 39.5) else "green"
+            label_suffix = f" (+{step})"
+            
+            matrix_html += (
+                f"🎯 Tgt: <span style='color:blue; font-weight:bold;'>{alt_arrow:4.1f}</span>{label_suffix:<4} | "
+                f"👟 Sld: <span style='color:orange; font-weight:bold;'>{int(round(alt_slide)):2d}</span> | "
+                f"🏁 Pin: <span style='color:{color}; font-weight:bold;'>B {alt_pins:.1f}</span><br>"
+            )
+    matrix_html += '</div>'
+    st.html(matrix_html)
+else:
+    st.markdown("`None`")
+
+st.markdown("---")
+
+# Scroll down further to see the visual graph
+st.markdown("### 🗺️ VISUAL PATH MAP")
+st.pyplot(fig_asset)
+plt.close(fig_asset)
+
+st.markdown("---")
+
+# Pin Reference Deck Map at the bottom
+st.markdown("### 📋 PIN REFERENCE (60 FT)")
+st.html("""
+<div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
+  <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
+  <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
+  <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
+</div>
+""")
