@@ -79,12 +79,12 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
 # 2. MOBILE-FIRST UI LAYOUT
 st.markdown("## 🎳 Vector Calculator")
 
-# Inputs expander - STEP VALUES CHANGED TO 1.0 FOR QUICK STEPPING
+# Inputs expander - FIXED: format="%d" hides trailing decimals in the UI
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
-    arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=1.0)
-    dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16, max_value=60, value=44, step=1)
-    board_val = st.number_input('Breakpoint Target (Board):', min_value=-5.0, max_value=45.0, value=7.0, step=1.0)
-    offset_val = st.number_input('Personal Offset (Boards):', min_value=0.0, max_value=25.0, value=10.0, step=1.0)
+    arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=1.0, format="%d")
+    dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16, max_value=60, value=44, step=1, format="%d")
+    board_val = st.number_input('Breakpoint Target (Board):', min_value=-5.0, max_value=45.0, value=7.0, step=1.0, format="%d")
+    offset_val = st.number_input('Personal Offset (Boards):', min_value=0.0, max_value=25.0, value=10.0, step=1.0, format="%d")
 
 # Calculate Engine Metrics
 slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, offset_val)
@@ -94,7 +94,7 @@ with st.container(border=True):
     st.markdown("### 📋 TARGET RESULTS")
     
     if pins_num < 0.5 or pins_num > 39.5:
-        st.markdown(f"**FOCAL POINT:** ({pins_num:.1f}) ❌")
+        st.markdown(f"**FOCAL POINT:** Gutter ({pins_num:.1f}) ❌")
     else:
         st.markdown(f"**FOCAL POINT:** {pins_num:.1f}")
 
