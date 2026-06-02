@@ -23,47 +23,47 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ball_y = np.linspace(foul_line, pins_dist, 100)
     ball_x = slope * ball_y + intercept
 
-    # FIXED RESOLUTION SIZING: Standard layout ratios for clean 12px mobile fonts
-    fig, ax = plt.subplots(figsize=(4.2, 6.5)) 
+    # ULTRA-COMPACT CANVAS: Dropped size and scaled text base to tight micro-proportions
+    fig, ax = plt.subplots(figsize=(2.6, 4.0)) 
     ax.set_aspect(3.0, adjustable='box')
     
     # Lane elements
-    ax.plot([0.5, 0.5], [foul_line, pins_dist], color='black', linewidth=1.8)
-    ax.plot([39.5, 39.5], [foul_line, pins_dist], color='black', linewidth=1.8)
-    ax.axhline(y=foul_line, color='black', linestyle='-', linewidth=1.8)
-    ax.axhline(y=arrows_dist, color='blue', linestyle='--', linewidth=0.8)
-    ax.axhline(y=pins_dist, color='black', linestyle='-', linewidth=1.8)
+    ax.plot([0.5, 0.5], [foul_line, pins_dist], color='black', linewidth=1.2)
+    ax.plot([39.5, 39.5], [foul_line, pins_dist], color='black', linewidth=1.2)
+    ax.axhline(y=foul_line, color='black', linestyle='-', linewidth=1.2)
+    ax.axhline(y=arrows_dist, color='blue', linestyle='--', linewidth=0.6)
+    ax.axhline(y=pins_dist, color='black', linestyle='-', linewidth=1.2)
     ax.fill_between([0.5, 39.5], approach_start, foul_line, color='lightgray', alpha=0.2)
-    ax.plot([0.5, 39.5], [breakpoint_dist, breakpoint_dist], color='purple', linestyle='-', linewidth=1.2, alpha=0.6)
+    ax.plot([0.5, 39.5], [breakpoint_dist, breakpoint_dist], color='purple', linestyle='-', linewidth=1.0, alpha=0.6)
     
-    for board in range(1, 40): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.2, alpha=0.15)
-    for board in range(5, 40, 5): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.6, alpha=0.4)
+    for board in range(1, 40): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.15, alpha=0.1)
+    for board in range(5, 40, 5): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.4, alpha=0.3)
     
-    # Path & Markers (Scaled properly for un-stretched display)
-    ax.plot(ball_x, ball_y, color='red', linewidth=2.5, zorder=4)
+    # Path & Markers (Tuned fine for micro view)
+    ax.plot(ball_x, ball_y, color='red', linewidth=1.8, zorder=4)
     
     # Slide Stance (Orange)
-    ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=100, zorder=8)
-    ax.plot([calculated_slide_board, calculated_slide_board], [approach_start, foul_line], color='orange', linestyle='-.', linewidth=1.2)
+    ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=60, zorder=8)
+    ax.plot([calculated_slide_board, calculated_slide_board], [approach_start, foul_line], color='orange', linestyle='-.', linewidth=0.8)
     
     # Release Point, Target Arrow, and Breakpoint Markers
-    ax.scatter([ball_at_foul_line], [foul_line], color='red', s=70, zorder=5)
-    ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=60, zorder=7)
-    ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=85, zorder=7)
+    ax.scatter([ball_at_foul_line], [foul_line], color='red', s=45, zorder=5)
+    ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=35, zorder=7)
+    ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=55, zorder=7)
     
     # Visual indicator at 60ft pins
     if 0.5 <= ball_at_pins <= 39.5:
-        ax.scatter([ball_at_pins], [pins_dist], color='darkgreen', marker='v', s=70, zorder=7)
+        ax.scatter([ball_at_pins], [pins_dist], color='darkgreen', marker='v', s=45, zorder=7)
     else:
-        ax.scatter([ball_at_pins], [pins_dist], color='darkred', marker='x', s=70, zorder=7)
+        ax.scatter([ball_at_pins], [pins_dist], color='darkred', marker='x', s=45, zorder=7)
     
     ax.set_xlim(45, -5) 
     ax.set_ylim(-6, 62)
     
-    # Precise readable text sizes (Won't get bloated anymore)
-    ax.set_xlabel('Lane Boards', fontsize=11)
-    ax.set_ylabel('Distance (ft)', fontsize=11)
-    ax.tick_params(axis='both', which='major', labelsize=10)
+    # Crisp Micro Fonts for phone screen layout
+    ax.set_xlabel('Lane Boards', fontsize=9)
+    ax.set_ylabel('Distance (ft)', fontsize=9)
+    ax.tick_params(axis='both', which='major', labelsize=8)
     ax.grid(False)
     
     plt.tight_layout()
@@ -131,7 +131,6 @@ st.markdown("---")
 
 # Compact visual graph path map
 st.markdown("### 🗺️ VISUAL PATH MAP")
-# FIX: width="content" forces Streamlit to respect our raw font sizing rules!
 st.pyplot(fig_asset, width="content")
 plt.close(fig_asset)
 
