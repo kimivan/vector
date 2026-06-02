@@ -60,7 +60,7 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ax.set_xlim(45, -5) 
     ax.set_ylim(-6, 62)
     
-    # FIXED: Explicitly set lane board tick values to exactly 0, 20, 40
+    # Fixed board tick values
     ax.set_xticks([0, 20, 40])
     
     # Ultra-shrunk Typography for mobile viewport
@@ -87,25 +87,26 @@ slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, 
 
 st.markdown("### 📋 TARGET RESULTS")
 
-# Live target metrics
-metric_col1, metric_col2 = st.columns(2)
-with metric_col1:
-    if pins_num < 0.5 or pins_num > 39.5:
-        st.metric(label="❌ FOCAL POINT", value=f"Gutter ({pins_num:.1f})")
-    else:
-        st.metric(label="🎳 FOCAL POINT", value=f"Board {pins_num:.1f}")
-with metric_col2:
-    st.metric(label="👟 STANDING SLIDE", value=f"Board {int(round(slide_num))}")
+# FIXED: Removed st.metric and used unified font sizing markdown strings
+if pins_num < 0.5 or pins_num > 39.5:
+    st.markdown(f"🔴 **❌ FOCAL POINT:** Gutter ({pins_num:.1f})")
+else:
+    st.markdown(f"🟢 **🎳 FOCAL POINT:** Board {pins_num:.1f}")
 
-metric_col3, metric_col4 = st.columns(2)
-with metric_col3:
-    st.markdown(f"🟣 **Breakpoint Target:** Board {board_val:.1f}")
-with metric_col4:
-    st.markdown(f"🔵 **Target Arrow:** Board {int(round(arrow_val))}")
+st.markdown(f"🟠 **👟 STANDING SLIDE:** Board {int(round(slide_num))}")
+st.markdown(f"🟣 **📍 BREAKPOINT TARGET:** Board {board_val:.1f}")
+st.markdown(f"🔵 **🎯 TARGET ARROW:** Board {int(round(arrow_val))}")
 
 st.markdown("---")
 
-# Spare adjustments panel
+# Compact visual graph path map
+st.markdown("### 🗺️ VISUAL PATH MAP")
+st.pyplot(fig_asset, width="content")
+plt.close(fig_asset)
+
+st.markdown("---")
+
+# FIXED: Moved "Next line adjustments" down below the graph canvas
 st.markdown("### 🎳 Next line adjustments")
 if dist_val < 60:
     matrix_html = '<div style="font-family: monospace; line-height: 1.8; font-size: 11px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">'
@@ -132,19 +133,12 @@ else:
 
 st.markdown("---")
 
-# Compact visual graph path map
-st.markdown("### 🗺️ VISUAL PATH MAP")
-st.pyplot(fig_asset, width="content")
-plt.close(fig_asset)
-
-st.markdown("---")
-
-# Pin Reference Deck Map inside an expander
-with st.expander("📋 PIN REFERENCE (60 FT)", expanded=False):
-    st.html("""
-    <div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
-      <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
-      <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
-      <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
-    </div>
-    """)
+# FIXED: Removed expander dropdown container; completely open code window block
+st.markdown("### 📋 PIN REFERENCE (60 FT)")
+st.html("""
+<div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
+  <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
+  <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
+  <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
+</div>
+""")
