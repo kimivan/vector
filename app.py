@@ -134,7 +134,7 @@ else:
 st.markdown("---")
 
 # FIXED: Removed expander dropdown container; completely open code window block
-st.markdown("### 📋 PIN REFERENCE (60 FT)")
+st.markdown("### 📋 Pin Reference (60 FT)")
 st.html("""
 <div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
   <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
