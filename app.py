@@ -140,7 +140,7 @@ else:
 st.markdown("---")
 
 # Pin Reference Deck Map
-st.markdown("### 📋 Pin Reference Deck (60 FT)")
+st.markdown("### 📋 Pin Reference")
 with st.container(border=True):
     col_left, col_right = st.columns(2)
     with col_left:
