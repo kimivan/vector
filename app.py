@@ -125,9 +125,9 @@ if dist_val < 60:
             
             pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{alt_pins:.1f}"
             table_data.append({
-                "Target": ({alt_arrow:.1f})",
-                "Slide": f"Board {int(round(alt_slide))}",
-                "Focal Point": pin_label
+                "Target Line": f"Base +{step} ({alt_arrow:.1f})",
+                "Slide Stand": f"Board {int(round(alt_slide))}",
+                "Focal Pin": pin_label
             })
             
     if table_data:
