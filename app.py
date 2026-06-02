@@ -27,7 +27,7 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     fig, ax = plt.subplots(figsize=(2.4, 3.8)) 
     ax.set_aspect(3.0, adjustable='box')
     
-    # DESIGN FIX: Transparency layer so it adapts cleanly to Light/Dark mobile system themes
+    # Transparency layer so it adapts cleanly to Light/Dark mobile system themes
     fig.patch.set_alpha(0.0)
     ax.patch.set_alpha(0.0)
     
@@ -77,10 +77,9 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     return calculated_slide_board, ball_at_pins, fig
 
 # 2. MOBILE-FIRST UI LAYOUT
-# DESIGN FIX: Use markdown instead of giant st.title to save immediate screen real estate on launch
 st.markdown("## 🎳 Vector Calculator")
 
-# Inputs expander - Named inputs clearly for quick lane updates
+# Inputs expander
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
     arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
     dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16, max_value=60, value=44, step=1)
@@ -90,7 +89,7 @@ with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
 # Calculate Engine Metrics
 slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, offset_val)
 
-# DESIGN FIX: Enclosing main numbers inside a visual card border for rapid scannability
+# Target results inside visual card container
 with st.container(border=True):
     st.markdown("### 📋 TARGET RESULTS")
     
@@ -103,7 +102,7 @@ with st.container(border=True):
     st.markdown(f"**TARGET:** Board {int(round(arrow_val))}")
     st.markdown(f"**SLIDE POSITION:** Board {int(round(slide_num))}")
 
-st.markdown("---")
+# FIXED: Removed the st.markdown("---") that was right here
 
 # Compact visual graph path map
 st.markdown("### 🗺️ VISUAL PATH MAP")
@@ -112,7 +111,7 @@ plt.close(fig_asset)
 
 st.markdown("---")
 
-# DESIGN FIX: Replacing raw custom string block with a clean, beautifully formatted native markdown table
+# Next Line Adjustments
 st.markdown("### 🎯 Next Line Adjustments")
 if dist_val < 60:
     table_data = []
@@ -126,9 +125,9 @@ if dist_val < 60:
             
             pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{alt_pins:.1f}"
             table_data.append({
-                "Target Line": f"Base +{step} ({alt_arrow:.1f})",
-                "Slide Stand": f"Board {int(round(alt_slide))}",
-                "Focal Pin": pin_label
+                "Target": ({alt_arrow:.1f})",
+                "Slide": f"Board {int(round(alt_slide))}",
+                "Focal Point": pin_label
             })
             
     if table_data:
@@ -140,7 +139,7 @@ else:
 
 st.markdown("---")
 
-# DESIGN FIX: Wrapped the reference grid inside a clean card system matching the target results block
+# Pin Reference Deck Map
 st.markdown("### 📋 Pin Reference Deck (60 FT)")
 with st.container(border=True):
     col_left, col_right = st.columns(2)
