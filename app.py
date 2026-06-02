@@ -77,8 +77,8 @@ st.title("🎳 Vector Calculator")
 
 # Inputs expander
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
-    arrow_val = st.number_input('Target Arrow:', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
-    dist_val = st.number_input('BP Dist:', min_value=16, max_value=60, value=44, step=1)
+    arrow_val = st.number_input('Target:', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
+    dist_val = st.number_input('BP Distance:', min_value=16, max_value=60, value=44, step=1)
     board_val = st.number_input('BP Board:', min_value=-5.0, max_value=45.0, value=7.0, step=0.1)
     offset_val = st.number_input('Offset:', min_value=0.0, max_value=25.0, value=10.0, step=0.5)
 
@@ -89,13 +89,13 @@ st.markdown("### 📋 TARGET RESULTS")
 
 # FIXED: Removed st.metric and used unified font sizing markdown strings
 if pins_num < 0.5 or pins_num > 39.5:
-    st.markdown(f"🔴 **❌ FOCAL POINT:** Gutter ({pins_num:.1f})")
+    st.markdown(f"🔴 **❌ FOCAL POINT:** ({pins_num:.1f})")
 else:
-    st.markdown(f"🟢 **🎳 FOCAL POINT:** Board {pins_num:.1f}")
+    st.markdown(f"🟢 **🎳 FOCAL POINT:** {pins_num:.1f}")
 
-st.markdown(f"🟠 **👟 STANDING SLIDE:** Board {int(round(slide_num))}")
-st.markdown(f"🟣 **📍 BREAKPOINT TARGET:** Board {board_val:.1f}")
-st.markdown(f"🔵 **🎯 TARGET ARROW:** Board {int(round(arrow_val))}")
+st.markdown(f"🟠 **👟 SLIDE:**  {int(round(slide_num))}")
+st.markdown(f"🟣 **📍 BREAKPOINT:**  {board_val:.1f}")
+st.markdown(f"🔵 **🎯 TARGET:**  {int(round(arrow_val))}")
 
 st.markdown("---")
 
@@ -122,9 +122,9 @@ if dist_val < 60:
             label_suffix = f" (+{step})"
             
             matrix_html += (
-                f"🎯 Tgt: <span style='color:blue; font-weight:bold;'>{alt_arrow:4.1f}</span>{label_suffix:<4} | "
-                f"👟 Sld: <span style='color:orange; font-weight:bold;'>{int(round(alt_slide)):2d}</span> | "
-                f"🏁 Pin: <span style='color:{color}; font-weight:bold;'>B {alt_pins:.1f}</span><br>"
+                f"🎯 Target: <span style='color:blue; font-weight:bold;'>{alt_arrow:4.1f}</span>{label_suffix:<4} | "
+                f"👟 Slide: <span style='color:orange; font-weight:bold;'>{int(round(alt_slide)):2d}</span> | "
+                f"🏁 Focal Point: <span style='color:{color}; font-weight:bold;'>B {alt_pins:.1f}</span><br>"
             )
     matrix_html += '</div>'
     st.html(matrix_html)
