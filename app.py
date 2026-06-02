@@ -125,9 +125,9 @@ if dist_val < 60:
             
             # FIXED: Removed 'Base +X' format and forced clean integer rounding on targets
             table_data.append({
-                "Target Line": f"{int(round(alt_arrow))}",
-                "Slide Stand": f"Board {int(round(alt_slide))}",
-                "Focal Pin": pin_label
+                "Target": f"{int(round(alt_arrow))}",
+                "Slide": f"{int(round(alt_slide))}",
+                "Focal Ppoint": pin_label
             })
             
     if table_data:
