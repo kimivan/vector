@@ -87,15 +87,15 @@ slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, 
 
 st.markdown("### 📋 TARGET RESULTS")
 
-# FIXED: Removed st.metric and used unified font sizing markdown strings
+# FIXED: Removed icons entirely from the text strings
 if pins_num < 0.5 or pins_num > 39.5:
-    st.markdown(f"🔴 ** FOCAL POINT:** ({pins_num:.1f})")
+    st.markdown(f"**FOCAL POINT:** Gutter ({pins_num:.1f})")
 else:
-    st.markdown(f"🟢 ** FOCAL POINT:** {pins_num:.1f}")
+    st.markdown(f"**FOCAL POINT:** Board {pins_num:.1f}")
 
-st.markdown(f"🟠 ** SLIDE:**  {int(round(slide_num))}")
-st.markdown(f"🟣 ** BREAKPOINT:**  {board_val:.1f}")
-st.markdown(f"🔵 ** TARGET:**  {int(round(arrow_val))}")
+st.markdown(f"**STANDING SLIDE:** Board {int(round(slide_num))}")
+st.markdown(f"**BREAKPOINT TARGET:** Board {board_val:.1f}")
+st.markdown(f"**TARGET ARROW:** Board {int(round(arrow_val))}")
 
 st.markdown("---")
 
