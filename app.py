@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 
-# Set page config for mobile-friendly view
+# Set page config for a professional mobile utility look
 st.set_page_config(page_title="Bowling Vector App", layout="centered")
 
 # 1. CORE VECTOR CALCULATION & PLOTTING ENGINE
@@ -23,9 +23,13 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ball_y = np.linspace(foul_line, pins_dist, 100)
     ball_x = slope * ball_y + intercept
 
-    # ULTRA-COMPACT CANVAS: Perfect for small mobile layouts
+    # ULTRA-COMPACT CANVAS
     fig, ax = plt.subplots(figsize=(2.4, 3.8)) 
     ax.set_aspect(3.0, adjustable='box')
+    
+    # DESIGN FIX: Transparency layer so it adapts cleanly to Light/Dark mobile system themes
+    fig.patch.set_alpha(0.0)
+    ax.patch.set_alpha(0.0)
     
     # Lane elements (Fine lines)
     ax.plot([0.5, 0.5], [foul_line, pins_dist], color='black', linewidth=1.0)
@@ -39,14 +43,14 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     for board in range(1, 40): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.1, alpha=0.08)
     for board in range(5, 40, 5): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.3, alpha=0.25)
     
-    # Path & Markers (Scaled down to micro sizes)
+    # Path & Markers
     ax.plot(ball_x, ball_y, color='red', linewidth=1.4, zorder=4)
     
     # Slide Stance (Orange)
     ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=35, zorder=8)
     ax.plot([calculated_slide_board, calculated_slide_board], [approach_start, foul_line], color='orange', linestyle='-.', linewidth=0.6)
     
-    # Release Point, Target Arrow, and Breakpoint Markers (Micro sizing)
+    # Release Point, Target Arrow, and Breakpoint Markers
     ax.scatter([ball_at_foul_line], [foul_line], color='red', s=25, zorder=5)
     ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=20, zorder=7)
     ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=30, zorder=7)
@@ -73,29 +77,31 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     return calculated_slide_board, ball_at_pins, fig
 
 # 2. MOBILE-FIRST UI LAYOUT
-st.title("🎳 Vector Calculator")
+# DESIGN FIX: Use markdown instead of giant st.title to save immediate screen real estate on launch
+st.markdown("## 🎳 Vector Calculator")
 
-# Inputs expander
+# Inputs expander - Named inputs clearly for quick lane updates
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
-    arrow_val = st.number_input('Target:', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
-    dist_val = st.number_input('BP Distance:', min_value=16, max_value=60, value=44, step=1)
-    board_val = st.number_input('BP Board:', min_value=-5.0, max_value=45.0, value=7.0, step=0.1)
-    offset_val = st.number_input('Offset:', min_value=0.0, max_value=25.0, value=10.0, step=0.5)
+    arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
+    dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16, max_value=60, value=44, step=1)
+    board_val = st.number_input('Breakpoint Target (Board):', min_value=-5.0, max_value=45.0, value=7.0, step=0.1)
+    offset_val = st.number_input('Personal Offset (Boards):', min_value=0.0, max_value=25.0, value=10.0, step=0.5)
 
 # Calculate Engine Metrics
 slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, offset_val)
 
-st.markdown("### 📋 TARGET RESULTS")
+# DESIGN FIX: Enclosing main numbers inside a visual card border for rapid scannability
+with st.container(border=True):
+    st.markdown("### 📋 TARGET RESULTS")
+    
+    if pins_num < 0.5 or pins_num > 39.5:
+        st.markdown(f"**FOCAL POINT:** Gutter ({pins_num:.1f}) ❌")
+    else:
+        st.markdown(f"**FOCAL POINT:** Board {pins_num:.1f}")
 
-# FIXED: Removed icons entirely from the text strings
-if pins_num < 0.5 or pins_num > 39.5:
-    st.markdown(f"**FOCAL POINT:** ({pins_num:.1f})")
-else:
-    st.markdown(f"**FOCAL POINT:** {pins_num:.1f}")
-
-st.markdown(f"**BREAKPOINT:**  {board_val:.1f}")
-st.markdown(f"**TARGET:**  {int(round(arrow_val))}")
-st.markdown(f"**SLIDE:**  {int(round(slide_num))}")
+    st.markdown(f"**BREAKPOINT:** Board {board_val:.1f}")
+    st.markdown(f"**TARGET:** Board {int(round(arrow_val))}")
+    st.markdown(f"**SLIDE POSITION:** Board {int(round(slide_num))}")
 
 st.markdown("---")
 
@@ -106,10 +112,10 @@ plt.close(fig_asset)
 
 st.markdown("---")
 
-# FIXED: Moved "Next line adjustments" down below the graph canvas
-st.markdown("### 🎳 Next line adjustments")
+# DESIGN FIX: Replacing raw custom string block with a clean, beautifully formatted native markdown table
+st.markdown("### 🎯 Next Line Adjustments")
 if dist_val < 60:
-    matrix_html = '<div style="font-family: monospace; line-height: 1.8; font-size: 11px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">'
+    table_data = []
     for step in range(1, 5):
         alt_arrow = arrow_val + step
         if alt_arrow <= 39.5:
@@ -118,27 +124,27 @@ if dist_val < 60:
             alt_pins = (alt_slope * 60) + alt_intercept
             alt_slide = alt_intercept + offset_val
             
-            color = "darkred" if (alt_pins < 0.5 or alt_pins > 39.5) else "green"
-            label_suffix = f" (+{step})"
+            pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{alt_pins:.1f}"
+            table_data.append({
+                "Target Line": f"Base +{step} ({alt_arrow:.1f})",
+                "Slide Stand": f"Board {int(round(alt_slide))}",
+                "Focal Pin": pin_label
+            })
             
-            matrix_html += (
-                f"Target: <span style='color:blue; font-weight:bold;'>{alt_arrow:4.1f}</span>{label_suffix:<4} | "
-                f"Slide: <span style='color:orange; font-weight:bold;'>{int(round(alt_slide)):2d}</span> | "
-                f"Focal Point: <span style='color:{color}; font-weight:bold;'> {alt_pins:.1f}</span><br>"
-            )
-    matrix_html += '</div>'
-    st.html(matrix_html)
+    if table_data:
+        st.table(table_data)
+    else:
+        st.markdown("`No legal adjustments available`")
 else:
     st.markdown("`None`")
 
 st.markdown("---")
 
-# FIXED: Removed expander dropdown container; completely open code window block
-st.markdown("### 📋 Pin Reference (60 FT)")
-st.html("""
-<div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
-  <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
-  <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
-  <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
-</div>
-""")
+# DESIGN FIX: Wrapped the reference grid inside a clean card system matching the target results block
+st.markdown("### 📋 Pin Reference Deck (60 FT)")
+with st.container(border=True):
+    col_left, col_right = st.columns(2)
+    with col_left:
+        st.markdown("**7 Pin:** Board 36.5\n\n**4 Pin:** Board 31.0\n\n**2 Pin:** Board 25.5")
+    with col_right:
+        st.markdown("**3 Pin:** Board 14.5\n\n**6 Pin:** Board 9.0\n\n**10 Pin:** Board 3.5")
