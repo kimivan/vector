@@ -127,7 +127,7 @@ if dist_val < 60:
             table_data.append({
                 "Target": f"{int(round(alt_arrow))}",
                 "Slide": f"{int(round(alt_slide))}",
-                "Focal Ppoint": pin_label
+                "Focal Point": pin_label
             })
             
     if table_data:
