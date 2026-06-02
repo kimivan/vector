@@ -12,7 +12,7 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     arrows_dist = 15
     pins_dist = 60
     
-    # Core calculations for the primary line
+    # Core calculations stay 100% accurate with floating point numbers
     slope = (breakpoint_board - target_arrow) / (breakpoint_dist - arrows_dist)
     intercept = target_arrow - (slope * arrows_dist)
     
@@ -79,28 +79,30 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
 # 2. MOBILE-FIRST UI LAYOUT
 st.markdown("## 🎳 Vector Calculator")
 
-# Inputs expander - FIXED: format="%d" hides trailing decimals in the UI
+# Inputs expander
+# FIXED: Kept min/max/value as floats, set step to 1.0. This preserves background decimal precision while format="%d" hides it visually without warning.
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
     arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=1.0, format="%d")
-    dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16, max_value=60, value=44, step=1, format="%d")
+    dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16.0, max_value=60.0, value=44.0, step=1.0, format="%d")
     board_val = st.number_input('Breakpoint Target (Board):', min_value=-5.0, max_value=45.0, value=7.0, step=1.0, format="%d")
     offset_val = st.number_input('Personal Offset (Boards):', min_value=0.0, max_value=25.0, value=10.0, step=1.0, format="%d")
 
-# Calculate Engine Metrics
+# Calculate Engine Metrics (runs with high-precision floats)
 slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, offset_val)
 
 # Target results inside visual card container
 with st.container(border=True):
     st.markdown("### 📋 TARGET RESULTS")
     
+    # Values are strictly rounded ONLY at the final display step
     if pins_num < 0.5 or pins_num > 39.5:
-        st.markdown(f"**FOCAL POINT:** Gutter ({pins_num:.1f}) ❌")
+        st.markdown(f"**FOCAL POINT:** Gutter ({int(round(pins_num))}) ❌")
     else:
-        st.markdown(f"**FOCAL POINT:** {pins_num:.1f}")
+        st.markdown(f"**FOCAL POINT:** Board {int(round(pins_num))}")
 
-    st.markdown(f"**BREAKPOINT:** {board_val:.1f}")
-    st.markdown(f"**TARGET:** {int(round(arrow_val))}")
-    st.markdown(f"**SLIDE:** {int(round(slide_num))}")
+    st.markdown(f"**BREAKPOINT:** Board {int(round(board_val))}")
+    st.markdown(f"**TARGET:** Board {int(round(arrow_val))}")
+    st.markdown(f"**SLIDE POSITION:** Board {int(round(slide_num))}")
 
 # Compact visual graph path map
 st.markdown("### 🗺️ VISUAL PATH MAP")
@@ -121,12 +123,12 @@ if dist_val < 60:
             alt_pins = (alt_slope * 60) + alt_intercept
             alt_slide = alt_intercept + offset_val
             
-            pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{int(round(alt_pins))}"
+            pin_label = f"Gutter ({int(round(alt_pins))})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{int(round(alt_pins))}"
             
             table_data.append({
-                "Target": f"{int(round(alt_arrow))}",
-                "Slide": f"{int(round(alt_slide))}",
-                "Focal Point": pin_label
+                "Target Line": f"{int(round(alt_arrow))}",
+                "Slide Stand": f"Board {int(round(alt_slide))}",
+                "Focal Pin": pin_label
             })
             
     if table_data:
@@ -138,11 +140,11 @@ else:
 
 st.markdown("---")
 
-# Pin Reference Deck Map
-st.markdown("### 📋 Pin Reference")
+# Pin Reference Deck Map (Unchanged clean view)
+st.markdown("### 📋 Pin Reference Deck (60 FT)")
 with st.container(border=True):
     col_left, col_right = st.columns(2)
     with col_left:
-        st.markdown("**7 Pin:** Board 36.5\n\n**4 Pin:** Board 31.0\n\n**2 Pin:** Board 25.5")
+        st.markdown("**7 Pin:** Board 37\n\n**4 Pin:** Board 31\n\n**2 Pin:** Board 26")
     with col_right:
-        st.markdown("**3 Pin:** Board 14.5\n\n**6 Pin:** Board 9.0\n\n**10 Pin:** Board 3.5")
+        st.markdown("**3 Pin:** Board 15\n\n**6 Pin:** Board 9\n\n**10 Pin:** Board 4")
