@@ -23,11 +23,20 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ball_y = np.linspace(foul_line, pins_dist, 100)
     ball_x = slope * ball_y + intercept
 
+    # FORCE MICRO-FONTS FOR MOBILE: Overriding global text scaling engine
+    plt.rcParams.update({
+        'font.size': 11,          # Standard fallback baseline size
+        'axes.labelsize': 12,     # Explicitly locks "Distance (ft)" and "Lane Boards" around 12-14px equivalent
+        'xtick.labelsize': 10,    # Small numbers for board markers
+        'ytick.labelsize': 10,    # Small numbers for distance markers
+        'figure.autolayout': True # Prevents tight_layout engine from blowing up text sizes 
+    })
+
     # Mobile compact canvas size
     fig, ax = plt.subplots(figsize=(3.2, 5.2)) 
     ax.set_aspect(3.0, adjustable='box')
     
-    # MOBILE SCALING: Adjusted line widths down for the cleaner compact view
+    # Lane elements
     ax.plot([0.5, 0.5], [foul_line, pins_dist], color='black', linewidth=1.5)
     ax.plot([39.5, 39.5], [foul_line, pins_dist], color='black', linewidth=1.5)
     ax.axhline(y=foul_line, color='black', linestyle='-', linewidth=1.5)
@@ -43,29 +52,27 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ax.plot(ball_x, ball_y, color='red', linewidth=2.0, zorder=4)
     
     # Slide Stance (Orange)
-    ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=80, zorder=8)
+    ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=60, zorder=8)
     ax.plot([calculated_slide_board, calculated_slide_board], [approach_start, foul_line], color='orange', linestyle='-.', linewidth=1.0)
     
     # Release Point, Target Arrow, and Breakpoint Markers scaled down
-    ax.scatter([ball_at_foul_line], [foul_line], color='red', s=50, zorder=5)
-    ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=45, zorder=7)
-    ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=65, zorder=7)
+    ax.scatter([ball_at_foul_line], [foul_line], color='red', s=40, zorder=5)
+    ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=35, zorder=7)
+    ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=55, zorder=7)
     
     # Visual indicator at 60ft pins
     if 0.5 <= ball_at_pins <= 39.5:
-        ax.scatter([ball_at_pins], [pins_dist], color='darkgreen', marker='v', s=50, zorder=7)
+        ax.scatter([ball_at_pins], [pins_dist], color='darkgreen', marker='v', s=40, zorder=7)
     else:
-        ax.scatter([ball_at_pins], [pins_dist], color='darkred', marker='x', s=50, zorder=7)
+        ax.scatter([ball_at_pins], [pins_dist], color='darkred', marker='x', s=40, zorder=7)
     
     ax.set_xlim(45, -5) 
     ax.set_ylim(-6, 62)
     
-    # MOBILE SCALING: Axis fonts and ticks shrunk down to prevent overlapping text
-    ax.set_xlabel('Lane Boards', fontsize=8)
-    ax.set_ylabel('Distance (ft)', fontsize=8)
-    ax.tick_params(axis='both', which='major', labelsize=7)
+    ax.set_xlabel('Lane Boards')
+    ax.set_ylabel('Distance (ft)')
     ax.grid(False)
-    plt.tight_layout()
+    
     return calculated_slide_board, ball_at_pins, fig
 
 # 2. MOBILE-FIRST UI LAYOUT
