@@ -23,7 +23,8 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ball_y = np.linspace(foul_line, pins_dist, 100)
     ball_x = slope * ball_y + intercept
 
-    fig, ax = plt.subplots(figsize=(4.5, 7.5)) # Slightly narrowed for vertical mobile screens
+    # MOBILE OPTIMIZATION: Shrink figsize from (4.5, 7.5) to a compact (3.2, 5.2)
+    fig, ax = plt.subplots(figsize=(3.2, 5.2)) 
     ax.set_aspect(3.0, adjustable='box')
     
     # Lane elements
@@ -57,8 +58,9 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     
     ax.set_xlim(45, -5) 
     ax.set_ylim(-6, 62)
-    ax.set_xlabel('Lane Boards')
-    ax.set_ylabel('Distance (ft)')
+    ax.set_xlabel('Lane Boards', fontsize=9)
+    ax.set_ylabel('Distance (ft)', fontsize=9)
+    ax.tick_params(axis='both', which='major', labelsize=8)
     ax.grid(False)
     plt.tight_layout()
     return calculated_slide_board, ball_at_pins, fig
@@ -66,8 +68,7 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
 # 2. MOBILE-FIRST UI LAYOUT
 st.title("🎳 Vector Calculator")
 
-# Put inputs inside a clean collapsible expander right on the main page 
-# (Easier to tap on mobile than opening the sidebar drawer)
+# Inputs expander
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
     arrow_val = st.number_input('Target Arrow:', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
     dist_val = st.number_input('BP Dist:', min_value=16, max_value=60, value=44, step=1)
@@ -79,7 +80,7 @@ slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, 
 
 st.markdown("### 📋 TARGET RESULTS")
 
-# High-visibility row for your primary phone view metrics
+# Live target metrics
 metric_col1, metric_col2 = st.columns(2)
 with metric_col1:
     if pins_num < 0.5 or pins_num > 39.5:
@@ -89,7 +90,6 @@ with metric_col1:
 with metric_col2:
     st.metric(label="👟 STANDING SLIDE", value=f"Board {int(round(slide_num))}")
 
-# Secondary metrics row below it
 metric_col3, metric_col4 = st.columns(2)
 with metric_col3:
     st.markdown(f"🟣 **Breakpoint Target:** Board {board_val:.1f}")
@@ -98,10 +98,10 @@ with metric_col4:
 
 st.markdown("---")
 
-# Spare adjustments panel (Visible immediately on mobile scroll)
+# Spare adjustments panel
 st.markdown("### 🎳 Next line adjustments")
 if dist_val < 60:
-    matrix_html = '<div style="font-family: monospace; line-height: 1.8; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">'
+    matrix_html = '<div style="font-family: monospace; line-height: 1.8; font-size: 11px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">'
     for step in range(1, 5):
         alt_arrow = arrow_val + step
         if alt_arrow <= 39.5:
@@ -125,19 +125,19 @@ else:
 
 st.markdown("---")
 
-# Scroll down further to see the visual graph
+# Compact visual graph path map
 st.markdown("### 🗺️ VISUAL PATH MAP")
 st.pyplot(fig_asset)
 plt.close(fig_asset)
 
 st.markdown("---")
 
-# Pin Reference Deck Map at the bottom
-st.markdown("### 📋 PIN REFERENCE (60 FT)")
-st.html("""
-<div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
-  <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
-  <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
-  <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
-</div>
-""")
+# Pin Reference Deck Map inside an expander to save mobile real estate
+with st.expander("📋 PIN REFERENCE (60 FT)", expanded=False):
+    st.html("""
+    <div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
+      <b>7 Pin:</b>  Board 36.5 &nbsp;&nbsp; <b>3 Pin:</b> Board 14.5<br>
+      <b>4 Pin:</b>  Board 31.0 &nbsp;&nbsp; <b>6 Pin:</b>  Board 9.0<br>
+      <b>2 Pin:</b>  Board 25.5 &nbsp;&nbsp; <b>10 Pin:</b> Board 3.5<br>
+    </div>
+    """)
