@@ -23,44 +23,47 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
     ball_y = np.linspace(foul_line, pins_dist, 100)
     ball_x = slope * ball_y + intercept
 
-    # MOBILE OPTIMIZATION: Shrink figsize from (4.5, 7.5) to a compact (3.2, 5.2)
+    # Mobile compact canvas size
     fig, ax = plt.subplots(figsize=(3.2, 5.2)) 
     ax.set_aspect(3.0, adjustable='box')
     
-    # Lane elements
-    ax.plot([0.5, 0.5], [foul_line, pins_dist], color='black', linewidth=2.5)
-    ax.plot([39.5, 39.5], [foul_line, pins_dist], color='black', linewidth=2.5)
-    ax.axhline(y=foul_line, color='black', linestyle='-', linewidth=2.5)
-    ax.axhline(y=arrows_dist, color='blue', linestyle='--', linewidth=1)
-    ax.axhline(y=pins_dist, color='black', linestyle='-', linewidth=2.5)
+    # MOBILE SCALING: Adjusted line widths down for the cleaner compact view
+    ax.plot([0.5, 0.5], [foul_line, pins_dist], color='black', linewidth=1.5)
+    ax.plot([39.5, 39.5], [foul_line, pins_dist], color='black', linewidth=1.5)
+    ax.axhline(y=foul_line, color='black', linestyle='-', linewidth=1.5)
+    ax.axhline(y=arrows_dist, color='blue', linestyle='--', linewidth=0.7)
+    ax.axhline(y=pins_dist, color='black', linestyle='-', linewidth=1.5)
     ax.fill_between([0.5, 39.5], approach_start, foul_line, color='lightgray', alpha=0.2)
-    ax.plot([0.5, 39.5], [breakpoint_dist, breakpoint_dist], color='purple', linestyle='-', linewidth=2, alpha=0.6)
+    ax.plot([0.5, 39.5], [breakpoint_dist, breakpoint_dist], color='purple', linestyle='-', linewidth=1.2, alpha=0.6)
     
-    for board in range(1, 40): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.3, alpha=0.25)
-    for board in range(5, 40, 5): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.9, alpha=0.65)
+    for board in range(1, 40): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.2, alpha=0.15)
+    for board in range(5, 40, 5): ax.axvline(x=board, color='gray', linestyle='-', linewidth=0.5, alpha=0.4)
     
-    # Path & Markers
-    ax.plot(ball_x, ball_y, color='red', linewidth=3.5, zorder=4)
+    # Path & Markers (Scaled down widths and marker sizes 's')
+    ax.plot(ball_x, ball_y, color='red', linewidth=2.0, zorder=4)
+    
     # Slide Stance (Orange)
-    ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=180, zorder=8)
-    ax.plot([calculated_slide_board, calculated_slide_board], [approach_start, foul_line], color='orange', linestyle='-.', linewidth=1.5)
+    ax.scatter([calculated_slide_board], [approach_start + 2], color='orange', marker='^', s=80, zorder=8)
+    ax.plot([calculated_slide_board, calculated_slide_board], [approach_start, foul_line], color='orange', linestyle='-.', linewidth=1.0)
     
-    # Release Point (Bright Red)
-    ax.scatter([ball_at_foul_line], [foul_line], color='red', s=120, zorder=5)
-    ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=100, zorder=7)
-    ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=150, zorder=7)
+    # Release Point, Target Arrow, and Breakpoint Markers scaled down
+    ax.scatter([ball_at_foul_line], [foul_line], color='red', s=50, zorder=5)
+    ax.scatter([target_arrow], [arrows_dist], color='blue', marker='o', s=45, zorder=7)
+    ax.scatter([breakpoint_board], [breakpoint_dist], color='purple', marker='X', s=65, zorder=7)
     
     # Visual indicator at 60ft pins
     if 0.5 <= ball_at_pins <= 39.5:
-        ax.scatter([ball_at_pins], [pins_dist], color='darkgreen', marker='v', s=120, zorder=7)
+        ax.scatter([ball_at_pins], [pins_dist], color='darkgreen', marker='v', s=50, zorder=7)
     else:
-        ax.scatter([ball_at_pins], [pins_dist], color='darkred', marker='x', s=120, zorder=7)
+        ax.scatter([ball_at_pins], [pins_dist], color='darkred', marker='x', s=50, zorder=7)
     
     ax.set_xlim(45, -5) 
     ax.set_ylim(-6, 62)
-    ax.set_xlabel('Lane Boards', fontsize=9)
-    ax.set_ylabel('Distance (ft)', fontsize=9)
-    ax.tick_params(axis='both', which='major', labelsize=8)
+    
+    # MOBILE SCALING: Axis fonts and ticks shrunk down to prevent overlapping text
+    ax.set_xlabel('Lane Boards', fontsize=8)
+    ax.set_ylabel('Distance (ft)', fontsize=8)
+    ax.tick_params(axis='both', which='major', labelsize=7)
     ax.grid(False)
     plt.tight_layout()
     return calculated_slide_board, ball_at_pins, fig
@@ -132,7 +135,7 @@ plt.close(fig_asset)
 
 st.markdown("---")
 
-# Pin Reference Deck Map inside an expander to save mobile real estate
+# Pin Reference Deck Map inside an expander
 with st.expander("📋 PIN REFERENCE (60 FT)", expanded=False):
     st.html("""
     <div style="font-family: monospace; line-height: 1.6; font-size: 13px; background-color: #f0f2f6; padding: 10px; border-radius: 5px;">
