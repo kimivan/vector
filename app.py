@@ -122,9 +122,9 @@ if dist_val < 60:
             label_suffix = f" (+{step})"
             
             matrix_html += (
-                f"🎯 Target: <span style='color:blue; font-weight:bold;'>{alt_arrow:4.1f}</span>{label_suffix:<4} | "
-                f"👟 Slide: <span style='color:orange; font-weight:bold;'>{int(round(alt_slide)):2d}</span> | "
-                f"🏁 Focal Point: <span style='color:{color}; font-weight:bold;'>B {alt_pins:.1f}</span><br>"
+                f"Target: <span style='color:blue; font-weight:bold;'>{alt_arrow:4.1f}</span>{label_suffix:<4} | "
+                f"Slide: <span style='color:orange; font-weight:bold;'>{int(round(alt_slide)):2d}</span> | "
+                f"Focal Point: <span style='color:{color}; font-weight:bold;'> {alt_pins:.1f}</span><br>"
             )
     matrix_html += '</div>'
     st.html(matrix_html)
