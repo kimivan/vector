@@ -89,13 +89,13 @@ st.markdown("### 📋 TARGET RESULTS")
 
 # FIXED: Removed st.metric and used unified font sizing markdown strings
 if pins_num < 0.5 or pins_num > 39.5:
-    st.markdown(f"🔴 **❌ FOCAL POINT:** ({pins_num:.1f})")
+    st.markdown(f"🔴 ** FOCAL POINT:** ({pins_num:.1f})")
 else:
-    st.markdown(f"🟢 **🎳 FOCAL POINT:** {pins_num:.1f}")
+    st.markdown(f"🟢 ** FOCAL POINT:** {pins_num:.1f}")
 
-st.markdown(f"🟠 **👟 SLIDE:**  {int(round(slide_num))}")
-st.markdown(f"🟣 **📍 BREAKPOINT:**  {board_val:.1f}")
-st.markdown(f"🔵 **🎯 TARGET:**  {int(round(arrow_val))}")
+st.markdown(f"🟠 ** SLIDE:**  {int(round(slide_num))}")
+st.markdown(f"🟣 ** BREAKPOINT:**  {board_val:.1f}")
+st.markdown(f"🔵 ** TARGET:**  {int(round(arrow_val))}")
 
 st.markdown("---")
 
