@@ -79,12 +79,12 @@ def run_vector_app(target_arrow, breakpoint_dist, breakpoint_board, personal_off
 # 2. MOBILE-FIRST UI LAYOUT
 st.markdown("## 🎳 Vector Calculator")
 
-# Inputs expander
+# Inputs expander - STEP VALUES CHANGED TO 1.0 FOR QUICK STEPPING
 with st.expander("📥 CHANGE TARGET INPUTS", expanded=False):
-    arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=0.5)
+    arrow_val = st.number_input('Target Arrow (Board):', min_value=1.0, max_value=39.0, value=15.0, step=1.0)
     dist_val = st.number_input('Breakpoint Distance (ft):', min_value=16, max_value=60, value=44, step=1)
-    board_val = st.number_input('Breakpoint Target (Board):', min_value=-5.0, max_value=45.0, value=7.0, step=0.1)
-    offset_val = st.number_input('Personal Offset (Boards):', min_value=0.0, max_value=25.0, value=10.0, step=0.5)
+    board_val = st.number_input('Breakpoint Target (Board):', min_value=-5.0, max_value=45.0, value=7.0, step=1.0)
+    offset_val = st.number_input('Personal Offset (Boards):', min_value=0.0, max_value=25.0, value=10.0, step=1.0)
 
 # Calculate Engine Metrics
 slide_num, pins_num, fig_asset = run_vector_app(arrow_val, dist_val, board_val, offset_val)
@@ -123,7 +123,6 @@ if dist_val < 60:
             
             pin_label = f"Gutter ({alt_pins:.1f})" if (alt_pins < 0.5 or alt_pins > 39.5) else f"{int(round(alt_pins))}"
             
-            # FIXED: Removed 'Base +X' format and forced clean integer rounding on targets
             table_data.append({
                 "Target": f"{int(round(alt_arrow))}",
                 "Slide": f"{int(round(alt_slide))}",
