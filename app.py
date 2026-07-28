@@ -76,7 +76,7 @@ st.markdown("---")
 # --- 3. FOCAL PIN BOARD GUIDE (BOTTOM REFERENCE) ---
 st.markdown(
     """
-    > **📌 Focal Pin Board Guide (Left - Center - Right):**
+    > ** Focal Pin Board Guide (Left - Center - Right):**
     > * **10 Pin:** 6 — **4** — 2
     > * **6 Pin:** 11 — **9** — 7
     > * **3 Pin:** 16 — **14** — 12
