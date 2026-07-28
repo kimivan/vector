@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 
-# Set page configuration
+# Set page layout
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="wide")
 
 st.title("🎳 3-Point Targeting & Lane Calculator")
@@ -28,7 +28,7 @@ focal_target = st.sidebar.number_input(
     max_value=39.0,
     value=9.0,
     step=0.5,
-    help="e.g., Center of 6-Pin = 9, Center of 10-Pin = 4, Headpin = 20",
+    help="e.g., Board 9 = Center of 6-Pin, Board 4 = Center of 10-Pin, Board 20 = Headpin",
 )
 
 slide_foot_offset = st.sidebar.slider(
@@ -148,18 +148,18 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
             zorder=3,
         )
 
-    # --- PIN DECK AT 60 FT ---
+    # --- PIN DECK AT 60 FT (Board numbers correct from right to left) ---
     pin_locations = {
         "1": (20, 60.0),
-        "2": (15, 60.866),
-        "3": (25, 60.866),
-        "4": (10, 61.732),
+        "2": (25, 60.866),  # 2-pin is to the left (higher board #)
+        "3": (15, 60.866),  # 3-pin is to the right (lower board #)
+        "4": (30, 61.732),
         "5": (20, 61.732),
-        "6": (30, 61.732),
-        "7": (5, 62.598),
-        "8": (15, 62.598),
-        "9": (25, 62.598),
-        "10": (35, 62.598),
+        "6": (10, 61.732),  # 6-pin center is ~board 9-10
+        "7": (35, 62.598),
+        "8": (25, 62.598),
+        "9": (15, 62.598),
+        "10": (5, 62.598),  # 10-pin is on board 4-5 on far right
     }
 
     for p_num, (p_board, p_dist) in pin_locations.items():
@@ -218,16 +218,19 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         label=f"Slide Foot ({slide:.1f})",
     )
 
-    # --- AXES & LABELS ---
+    # --- AXES & ORIENTATION ---
     ax.set_ylim(-5, 64)
     ax.set_xlim(-gutter_width_ft - 0.2, lane_width_ft + gutter_width_ft + 0.2)
+
+    # INVERT X-AXIS: So Board 1 (Right Gutter) is on the right, Board 39 (Left Gutter) on the left
+    ax.invert_xaxis()
 
     board_ticks = [1, 5, 10, 15, 20, 25, 30, 35, 39]
     board_positions = [b * FEET_PER_BOARD for b in board_ticks]
     ax.set_xticks(board_positions)
     ax.set_xticklabels([str(b) for b in board_ticks])
 
-    ax.set_xlabel("Board Number (Right 1 ➔ Left 39)", fontsize=9)
+    ax.set_xlabel("Board Number (Right 1 ◄ 39 Left)", fontsize=9)
     ax.set_ylabel("Distance from Foul Line (Feet)", fontsize=9)
 
     ax.grid(True, which="both", linestyle=":", alpha=0.3)
