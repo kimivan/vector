@@ -13,10 +13,7 @@ st.markdown(
     """
     <style>
     /* Remove unnecessary top padding for mobile viewports */
-    .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
-    }
+
     /* Style container cards */
     [data-testid="stForm"], [data-testid="stVerticalBlock"] > div > div[data-testid="stBlock"] {
         border-radius: 12px;
