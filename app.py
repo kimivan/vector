@@ -29,7 +29,7 @@ st.markdown(
     }
     </style>
     """,
-    unsafe_allow_javascript=True,
+    unsafe_allow_html=True,
 )
 
 # --- DEFAULT VALUES / SESSION STATE INITIALIZATION ---
@@ -43,16 +43,16 @@ if "slide_foot_offset" not in st.session_state:
     st.session_state.slide_foot_offset = 5.0
 
 # --- 1. INPUT CONTROLS ---
-st.subheader("🎯 Shot Targets & Settings")
+st.subheader("Targets")
 
 with st.container(border=True):
     st.number_input(
-        "Arrow Target (Board #)",
+        "Target at Arrows (Board #)",
         min_value=1.0,
         max_value=39.0,
         step=1.0,
         key="arrow_target",
-        help="Target at 15 feet from foul line",
+        help="Distance = 15 feet from foul line",
     )
 
     st.number_input(
@@ -61,7 +61,7 @@ with st.container(border=True):
         max_value=39.0,
         step=1.0,
         key="focal_target",
-        help="Target at 60 feet (e.g., Center of 6-Pin = Board 9)",
+        help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
     )
 
     st.slider(
@@ -70,7 +70,7 @@ with st.container(border=True):
         max_value=55.0,
         step=1.0,
         key="breakpoint_dist",
-        help="Distance down the lane where oil ends",
+        help="Distance down the lane where the oil ends / ball hooks.",
     )
 
     st.slider(
@@ -79,7 +79,7 @@ with st.container(border=True):
         max_value=7.0,
         step=1.0,
         key="slide_foot_offset",
-        help="Distance from inside sliding foot to ball laydown (Default: 5)",
+        help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
     )
 
 # --- CALCULATIONS ---
@@ -91,9 +91,7 @@ slide_board = laydown_board + st.session_state.slide_foot_offset
 slope = (st.session_state.focal_target - laydown_board) / 60.0
 breakpoint_board = laydown_board + (slope * st.session_state.breakpoint_dist)
 
-# --- 2. TRAJECTORY RESULT CARD ---
-st.subheader("📍 Target Line")
-
+# --- 2. FULL TRAJECTORY RESULTS ---
 st.success(
     f"Slide **{slide_board:.1f}** ➔ "
     f"Laydown **{laydown_board:.1f}** ➔ "
@@ -102,13 +100,13 @@ st.success(
     f"Focal **{st.session_state.focal_target:.0f}**"
 )
 
-# --- 3. PIN BOARD REFERENCE GUIDE ---
-with st.container(border=True):
-    st.markdown(
-        """
-        **📌 Focal Pin Board Guide** *(Left — Center — Right)*
-        * **10 Pin:** `6` — **`4`** — `2`
-        * **6 Pin:** `11` — **`9`** — `7`
-        * **3 Pin:** `16` — **`14`** — `12`
-        """
-    )
+st.markdown("---")
+
+# --- 3. FOCAL PIN BOARD GUIDE ---
+st.markdown(
+    """
+    > **10 Pin:** 6 — **4** — 2  
+    > **6 Pin:** 11 — **9** — 7  
+    > **3 Pin:** 16 — **14** — 12
+    """
+)
