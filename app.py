@@ -18,7 +18,7 @@ if "slide_foot_offset" not in st.session_state:
     st.session_state.slide_foot_offset = 5.0
 
 # --- 1. INPUT CONTROLS (TOP) ---
-st.subheader("Adjust Your Targets")
+st.subheader("Targets")
 
 with st.container(border=True):
     st.number_input(
