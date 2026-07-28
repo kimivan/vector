@@ -68,7 +68,6 @@ breakpoint_board = laydown_board + (slope * st.session_state.breakpoint_dist)
 
 # --- 2. FULL TRAJECTORY RESULTS (BOTTOM) ---
 st.success(
-    f"**Full Trajectory:**\n\n"
     f"Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{st.session_state.arrow_target:.1f}** ➔ Break **{breakpoint_board:.1f}** (@{st.session_state.breakpoint_dist:.0f}') ➔ Focal **{st.session_state.focal_target:.1f}**"
 )
 
