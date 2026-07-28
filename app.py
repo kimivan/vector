@@ -3,7 +3,7 @@ import streamlit as st
 # Page Configuration
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="centered")
 
-st.title("3-Point Targeting & Breakpoint Calculator")
+st.title("🎳 3-Point Targeting & Breakpoint Calculator")
 st.caption(
     "Based on Del Warren's Kegel 3-Point Targeting System ($3:1$ Expansion Ratio)"
 )
@@ -59,35 +59,23 @@ laydown_board = arrow_target + laydown_offset
 slide_board = laydown_board + slide_foot_offset
 
 # 2. Linear Interpolation for Breakpoint
-# Trajectory line goes from (0 ft, laydown) to (15 ft, arrow) to (60 ft, focal)
-# Slope (boards per foot) = (Focal Board - Laydown Board) / 60 ft
+# Trajectory slope (boards per foot) = (Focal Board - Laydown Board) / 60 ft
 slope = (focal_target - laydown_board) / 60.0
 breakpoint_board = laydown_board + (slope * breakpoint_dist)
 
 # --- DISPLAY RESULTS ---
 st.subheader("Your Line Summary")
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Slide Foot", f"Board {slide_board:.1f}")
-col2.metric("Laydown (Foul Line)", f"Board {laydown_board:.1f}")
-col3.metric("Arrow (15 ft)", f"Board {arrow_target:.1f}")
+col1, col2, col3, col4, col5 = st.columns(5)
+
+col1.metric("1. Slide Foot", f"B{slide_board:.1f}")
+col2.metric("2. Laydown", f"B{laydown_board:.1f}")
+col3.metric("3. Arrow (15')", f"B{arrow_target:.1f}")
+col4.metric(f"4. Break ({breakpoint_dist:.0f}')", f"B{breakpoint_board:.1f}")
+col5.metric("5. Focal (60')", f"B{focal_target:.1f}")
 
 st.markdown("---")
 
-# Breakpoint Highlights
-st.subheader("Breakpoint Location")
-
-st.success(
-    f"At **{breakpoint_dist:.0f} feet** down the lane, your ball crosses **Board {breakpoint_board:.1f}**"
+st.info(
+    f"**Quick Reference:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target:.1f}** ➔ Breakpoint **{breakpoint_board:.1f}** @ {breakpoint_dist:.0f}' ➔ Pins **{focal_target:.1f}**"
 )
-
-# Breakdown Card
-with st.expander("See Complete Trajectory Milestones"):
-    st.write(
-        f"""
-    * **Foul Line ($0\\text{{ ft}}$):** Laydown on **Board {laydown_board:.1f}** *(Feet on {slide_board:.1f})*
-    * **Target Arrows ($15\\text{{ ft}}$):** Target **Board {arrow_target:.1f}**
-    * **Breakpoint ({breakpoint_dist:.0f}$\\text{{ ft}}$):** Crosses **Board {breakpoint_board:.1f}**
-    * **Pin Deck ($60\\text{{ ft}}$):** Hits **Board {focal_target:.1f}**
-    """
-    )
