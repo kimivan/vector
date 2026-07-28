@@ -5,8 +5,7 @@ st.set_page_config(
     page_title="3-Point Targeting", page_icon="🎳", layout="centered"
 )
 
-st.title("🎳 3-Point Targeting")
-st.caption("Del Warren's Kegel 3-Point System ($3:1$ Ratio)")
+
 
 # --- DEFAULT VALUES / SESSION STATE INITIALIZATION ---
 if "arrow_target" not in st.session_state:
