@@ -3,8 +3,6 @@ import streamlit as st
 # Page Configuration
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="centered")
 
-st.title("3-Point Targeting")
-
 
 st.markdown("---")
 
