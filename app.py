@@ -3,6 +3,10 @@ import streamlit as st
 # Page Configuration
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="centered")
 
+st.title("🎳 3-Point Targeting & Breakpoint Calculator")
+st.caption(
+    "Based on Del Warren's Kegel 3-Point Targeting System ($3:1$ Expansion Ratio)"
+)
 
 st.markdown("---")
 
@@ -11,39 +15,50 @@ st.sidebar.header("1. Target Inputs")
 
 arrow_target = st.sidebar.number_input(
     "Target at Arrows (Board #)",
-    min_value=1,
-    max_value=39,
-    value=15,
-    step=1,
+    min_value=1.0,
+    max_value=39.0,
+    value=15.0,
+    step=0.5,
     help="Distance = 15 feet from foul line",
 )
 
 focal_target = st.sidebar.number_input(
     "Focal Target at Pins (Board #)",
-    min_value=1,
-    max_value=39,
-    value=9,
-    step=1,
-    help="Target at 60 feet. e.g., Center of 6-Pin = 9, Center of 10-Pin = 4, Headpin = 20",
+    min_value=1.0,
+    max_value=39.0,
+    value=9.0,
+    step=0.5,
+    help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
 )
 
+# Quick Reference Board Guide
+st.sidebar.markdown(
+    """
+    **📌 Focal Pin Targets (Left - Center - Right):**
+    * **10 Pin:** 6 — **4** — 2
+    * **6 Pin:** 11 — **9** — 7
+    * **3 Pin:** 16 — **14** — 12
+    """
+)
+
+st.sidebar.markdown("---")
 st.sidebar.header("2. Breakpoint & Stance")
 
 breakpoint_dist = st.sidebar.slider(
     "Breakpoint Distance (Feet)",
-    min_value=30,
-    max_value=55,
-    value=40,
-    step=1,
+    min_value=30.0,
+    max_value=55.0,
+    value=42.0,
+    step=1.0,
     help="Distance down the lane where the oil ends / ball hooks.",
 )
 
 slide_foot_offset = st.sidebar.slider(
     "Inside Foot Offset (Boards)",
-    min_value=3,
-    max_value=7,
-    value=5,
-    step=1,
+    min_value=3.0,
+    max_value=7.0,
+    value=5.0,
+    step=0.5,
     help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
 )
 
@@ -55,7 +70,6 @@ laydown_board = arrow_target + laydown_offset
 slide_board = laydown_board + slide_foot_offset
 
 # 2. Linear Interpolation for Breakpoint
-# Trajectory slope (boards per foot) = (Focal Board - Laydown Board) / 60 ft
 slope = (focal_target - laydown_board) / 60.0
 breakpoint_board = laydown_board + (slope * breakpoint_dist)
 
@@ -64,14 +78,14 @@ st.subheader("Your Line Summary")
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
-col1.metric("1. Slide Foot", f"{slide_board:.1f}")
-col2.metric("2. Laydown", f"{laydown_board:.1f}")
-col3.metric("3. Arrow (15')", f"{arrow_target}")
-col4.metric(f"4. Break ({breakpoint_dist}')", f"{breakpoint_board:.1f}")
-col5.metric("5. Focal (60')", f"{focal_target}")
+col1.metric("1. Slide Foot", f"B{slide_board:.1f}")
+col2.metric("2. Laydown", f"B{laydown_board:.1f}")
+col3.metric("3. Arrow (15')", f"B{arrow_target:.1f}")
+col4.metric(f"4. Break ({breakpoint_dist:.0f}')", f"B{breakpoint_board:.1f}")
+col5.metric("5. Focal (60')", f"B{focal_target:.1f}")
 
 st.markdown("---")
 
 st.info(
-    f"**Quick Reference:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target}** ➔ Breakpoint **{breakpoint_board:.1f}** @ {breakpoint_dist}' ➔ Pins **{focal_target}**"
+    f"**Quick Reference:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target:.1f}** ➔ Breakpoint **{breakpoint_board:.1f}** @ {breakpoint_dist:.0f}' ➔ Pins **{focal_target:.1f}**"
 )
