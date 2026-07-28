@@ -1,9 +1,8 @@
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
-import numpy as np
 import streamlit as st
 
-# Set page layout
+# Page Configuration
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="wide")
 
 st.title("🎳 3-Point Targeting & Lane Calculator")
@@ -28,7 +27,7 @@ focal_target = st.sidebar.number_input(
     max_value=39.0,
     value=9.0,
     step=0.5,
-    help="e.g., Board 9 = Center of 6-Pin, Board 4 = Center of 10-Pin, Board 20 = Headpin",
+    help="Board 9 = Center of 6-Pin (Right), Board 31 = Center of 4-Pin (Left)",
 )
 
 slide_foot_offset = st.sidebar.slider(
@@ -37,7 +36,7 @@ slide_foot_offset = st.sidebar.slider(
     max_value=7.0,
     value=5.0,
     step=0.5,
-    help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
+    help="Standard offset from inside sliding foot to ball laydown is 5 boards.",
 )
 
 # --- CALCULATIONS ---
@@ -46,55 +45,54 @@ laydown_offset = board_diff / 3.0
 laydown_board = arrow_target + laydown_offset
 slide_board = laydown_board + slide_foot_offset
 
-# --- MAIN DISPLAY: CALCULATED LINE ---
+# --- METRIC SUMMARY DISPLAY ---
 st.subheader("Your Calculated Line")
 
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("1. Slide Board (Foot)", f"{slide_board:.1f}")
+col1.metric("1. Slide Foot Board", f"{slide_board:.1f}")
 col2.metric("2. Laydown Board", f"{laydown_board:.1f}")
-col3.metric("3. Target Arrow", f"{arrow_target:.1f}")
-col4.metric("4. Pin / Focal Target", f"{focal_target:.1f}")
+col3.metric("3. Arrow Target", f"{arrow_target:.1f}")
+col4.metric("4. Focal Target", f"{focal_target:.1f}")
 
 st.info(
-    f"**Full Line Summary:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target:.1f}** ➔ Pins **{focal_target:.1f}**"
+    f"**Full Line:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target:.1f}** ➔ Focal Point **{focal_target:.1f}**"
 )
 
 # --- VISUALIZATION FUNCTION ---
 def plot_lane_trajectory(slide, laydown, arrow, focal):
-    # --- DIMENSIONAL CONSTANTS (USBC Specifications) ---
+    # USBC Dimensional Specs
     INCHES_PER_BOARD = 41.5 / 39.0
-    FEET_PER_BOARD = INCHES_PER_BOARD / 12.0  # ~0.0887 feet per board
+    FEET_PER_BOARD = INCHES_PER_BOARD / 12.0  # ~0.0887 ft/board
 
-    y_laydown_ft = laydown * FEET_PER_BOARD
-    y_arrow_ft = arrow * FEET_PER_BOARD
-    y_focal_ft = focal * FEET_PER_BOARD
-    y_slide_ft = slide * FEET_PER_BOARD
+    lane_width_ft = 39 * FEET_PER_BOARD
+    gutter_width_ft = 9.25 / 12.0
 
-    lane_width_ft = 39 * FEET_PER_BOARD  # ~3.46 ft
-    gutter_width_ft = 9.25 / 12.0  # 9.25 inches -> 0.77 ft
+    # Board X-Position Helper (Board 1 = Far Right, Board 39 = Far Left)
+    def b2x(board_num):
+        return (39.0 - board_num) * FEET_PER_BOARD
 
-    fig, ax = plt.subplots(figsize=(4.5, 11))
+    fig, ax = plt.subplots(figsize=(5, 11))
 
-    # --- DRAW LANE STRUCTURE ---
+    # --- LANE STRUCTURE ---
     lane_bg = patches.Rectangle(
         (0, 0),
         lane_width_ft,
         60,
-        linewidth=1.5,
+        linewidth=1.2,
         edgecolor="black",
-        facecolor="#f5e6ca",
+        facecolor="#fdf6e7",
         zorder=1,
     )
     ax.add_patch(lane_bg)
 
     approach_bg = patches.Rectangle(
-        (-gutter_width_ft, -15),
+        (-gutter_width_ft, -12),
         lane_width_ft + (2 * gutter_width_ft),
-        15,
+        12,
         linewidth=1,
         edgecolor="gray",
-        facecolor="#d2b48c",
-        alpha=0.5,
+        facecolor="#e6d7c3",
+        alpha=0.6,
         zorder=1,
     )
     ax.add_patch(approach_bg)
@@ -103,157 +101,149 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         (-gutter_width_ft, 0),
         gutter_width_ft,
         60,
-        facecolor="#708090",
-        alpha=0.6,
+        facecolor="#788896",
+        alpha=0.5,
         zorder=1,
     )
     l_gutter = patches.Rectangle(
         (lane_width_ft, 0),
         gutter_width_ft,
         60,
-        facecolor="#708090",
-        alpha=0.6,
+        facecolor="#788896",
+        alpha=0.5,
         zorder=1,
     )
     ax.add_patch(r_gutter)
     ax.add_patch(l_gutter)
 
-    ax.axhline(y=0, color="red", linewidth=2.5, zorder=3, label="Foul Line (0 ft)")
-    ax.axhline(
-        y=42,
-        color="#008b8b",
-        linestyle="--",
-        linewidth=1,
-        alpha=0.7,
-        zorder=2,
-        label="Pattern Exit (42 ft)",
+    ax.axhline(y=0, color="red", linewidth=2, zorder=3)
+    ax.text(
+        lane_width_ft / 2,
+        0.5,
+        "FOUL LINE",
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color="crimson",
+        fontweight="bold",
     )
 
-    # --- TARGET MARKINGS ---
+    # --- TARGET DOTS & ARROWS ---
     for b in [5, 10, 15, 20, 25, 30, 35]:
-        ax.plot(
-            b * FEET_PER_BOARD,
-            7,
-            "o",
-            color="saddlebrown",
-            markersize=3,
-            zorder=3,
-        )
-        ax.plot(
-            b * FEET_PER_BOARD,
-            15,
-            "^",
-            color="saddlebrown",
-            markersize=6,
-            zorder=3,
-        )
+        ax.plot(b2x(b), 7, "o", color="#8b5a2b", markersize=3, zorder=3)
+        ax.plot(b2x(b), 15, "^", color="#8b5a2b", markersize=5, zorder=3)
 
-    # --- PIN DECK AT 60 FT ---
-    pin_locations = {
+    # --- PIN DECK (Pins correctly mapped from Board 1 Right to 39 Left) ---
+    pin_boards = {
         "1": (20, 60.0),
         "2": (25, 60.866),
         "3": (15, 60.866),
         "4": (30, 61.732),
         "5": (20, 61.732),
-        "6": (10, 61.732),
+        "6": (10, 61.732),  # Board 9-10 (Right side)
         "7": (35, 62.598),
         "8": (25, 62.598),
         "9": (15, 62.598),
-        "10": (5, 62.598),
+        "10": (5, 62.598),  # Board 4-5 (Far Right)
     }
 
-    for p_num, (p_board, p_dist) in pin_locations.items():
+    for p_num, (p_board, p_dist) in pin_boards.items():
         ax.plot(
-            p_board * FEET_PER_BOARD,
+            b2x(p_board),
             p_dist,
             "o",
             color="white",
             markeredgecolor="black",
-            markersize=6,
+            markersize=7,
             zorder=4,
         )
 
     # --- TRAJECTORY LINE ---
+    x_slide = b2x(slide)
+    x_laydown = b2x(laydown)
+    x_arrow = b2x(arrow)
+    x_focal = b2x(focal)
+
     ax.plot(
-        [y_laydown_ft, y_arrow_ft, y_focal_ft],
+        [x_laydown, x_arrow, x_focal],
         [0, 15, 60],
         color="#0055ff",
         linewidth=2.5,
-        label="Ball Path Line",
         zorder=5,
     )
 
-    # --- KEY TARGET POINTS WITH DETAILED LEGEND LABELS ---
+    # --- TARGET DOTS WITH IN-LINE BOARD CALLOUTS ---
+    # 1. Slide Foot
     ax.scatter(
-        [y_slide_ft],
-        [-1.0],
-        color="black",
-        marker="s",
-        s=50,
-        zorder=6,
-        label=f"Slide Foot: Board {slide:.1f}",
+        [x_slide], [-2.0], color="black", marker="s", s=45, zorder=6
+    )
+    ax.annotate(
+        f"Foot: B{slide:.1f}",
+        (x_slide, -2.0),
+        textcoords="offset points",
+        xytext=(8, -3),
+        fontsize=8,
+        fontweight="bold",
+        zorder=7,
     )
 
-    ax.scatter(
-        [y_laydown_ft],
-        [0],
+    # 2. Laydown
+    ax.scatter([x_laydown], [0], color="crimson", s=55, zorder=6)
+    ax.annotate(
+        f"Laydown: B{laydown:.1f}",
+        (x_laydown, 0),
+        textcoords="offset points",
+        xytext=(8, -3),
+        fontsize=8,
         color="crimson",
-        s=60,
-        zorder=6,
-        label=f"Foul Line Laydown: Board {laydown:.1f}",
+        fontweight="bold",
+        zorder=7,
     )
 
-    ax.scatter(
-        [y_arrow_ft],
-        [15],
-        color="orange",
-        s=60,
-        zorder=6,
-        label=f"Target Arrow: Board {arrow:.1f}",
+    # 3. Arrow
+    ax.scatter([x_arrow], [15], color="darkorange", s=55, zorder=6)
+    ax.annotate(
+        f"Arrow: B{arrow:.1f}",
+        (x_arrow, 15),
+        textcoords="offset points",
+        xytext=(8, -3),
+        fontsize=8,
+        color="darkorange",
+        fontweight="bold",
+        zorder=7,
     )
 
-    ax.scatter(
-        [y_focal_ft],
-        [60],
+    # 4. Focal Point
+    ax.scatter([x_focal], [60], color="green", s=55, zorder=6)
+    ax.annotate(
+        f"Focal: B{focal:.1f}",
+        (x_focal, 60),
+        textcoords="offset points",
+        xytext=(8, -3),
+        fontsize=8,
         color="green",
-        s=60,
-        zorder=6,
-        label=f"Focal Point (Pins): Board {focal:.1f}",
+        fontweight="bold",
+        zorder=7,
     )
 
-    # --- AXES & ORIENTATION ---
-    ax.set_ylim(-5, 64)
+    # --- AXIS FORMATTING & ASPECT RATIO LOCK ---
+    ax.set_ylim(-6, 64)
     ax.set_xlim(-gutter_width_ft - 0.2, lane_width_ft + gutter_width_ft + 0.2)
 
-    # INVERT X-AXIS: Board 1 (Right Gutter) on right, Board 39 (Left Gutter) on left
-    ax.invert_xaxis()
-
+    # Ticks setup (Board 1 on far Right, Board 39 on Left)
     board_ticks = [1, 5, 10, 15, 20, 25, 30, 35, 39]
-    board_positions = [b * FEET_PER_BOARD for b in board_ticks]
-    ax.set_xticks(board_positions)
+    ax.set_xticks([b2x(b) for b in board_ticks])
     ax.set_xticklabels([str(b) for b in board_ticks])
 
-    ax.set_xlabel("Lane Board Number (Right 1 ◄ 39 Left)", fontsize=9)
+    ax.set_xlabel("Board # (Right 1 ◄ 39 Left)", fontsize=9)
     ax.set_ylabel("Distance from Foul Line (Feet)", fontsize=9)
-
     ax.grid(True, which="both", linestyle=":", alpha=0.3)
-
-    # EXPLICIT LEGEND DISPLAY
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.07),
-        ncol=1,
-        fontsize=9,
-        frameon=True,
-        facecolor="#ffffff",
-        edgecolor="gray",
-    )
 
     plt.tight_layout()
     return fig
 
 # --- RENDER DIAGRAM ---
-st.subheader("Scaled Lane Diagram with Target Legend")
+st.subheader("Lane Diagram with Live Board Readouts")
 fig = plot_lane_trajectory(
     slide_board, laydown_board, arrow_target, focal_target
 )
