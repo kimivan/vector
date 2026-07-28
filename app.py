@@ -68,11 +68,11 @@ st.subheader("Your Line Summary")
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
-col1.metric("1. Slide Foot", f"B{slide_board:.1f}")
-col2.metric("2. Laydown", f"B{laydown_board:.1f}")
-col3.metric("3. Arrow (15')", f"B{arrow_target}")
-col4.metric(f"4. Break ({breakpoint_dist}')", f"B{breakpoint_board:.1f}")
-col5.metric("5. Focal (60')", f"B{focal_target}")
+col1.metric("1. Slide Foot", f"{slide_board:.1f}")
+col2.metric("2. Laydown", f"{laydown_board:.1f}")
+col3.metric("3. Arrow (15')", f"{arrow_target}")
+col4.metric(f"4. Break ({breakpoint_dist}')", f"{breakpoint_board:.1f}")
+col5.metric("5. Focal (60')", f"{focal_target}")
 
 st.markdown("---")
 
