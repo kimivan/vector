@@ -93,7 +93,7 @@ st.success(
     f"Slide **{slide_board:.1f}** ➔ "
     f"Laydown **{laydown_board:.1f}** ➔ "
     f"Arrow **{st.session_state.arrow_target:.0f}** ➔ "
-    f"Break **{breakpoint_board:.1f}** (@{st.session_state.breakpoint_dist:.0f}') ➔ "
+    f"Break ** (@{st.session_state.breakpoint_dist:.0f}') ➔ "
     f"Focal **{st.session_state.focal_target:.0f}**"
 )
 
