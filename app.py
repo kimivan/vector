@@ -1,91 +1,104 @@
 import streamlit as st
 
-# Page Configuration
-st.set_page_config(page_title="3-Point Targeting Calculator", layout="centered")
-
-st.title("🎳 3-Point Targeting & Breakpoint Calculator")
-st.caption(
-    "Based on Del Warren's Kegel 3-Point Targeting System ($3:1$ Expansion Ratio)"
+# Page Configuration - Set to centered to optimize for mobile screens
+st.set_page_config(
+    page_title="3-Point Targeting", page_icon="🎳", layout="centered"
 )
 
-st.markdown("---")
+st.title("🎳 3-Point Targeting")
+st.caption("Del Warren's Kegel 3-Point System ($3:1$ Ratio)")
 
-# --- SIDEBAR INPUTS ---
-st.sidebar.header("1. Target Inputs")
-
-arrow_target = st.sidebar.number_input(
-    "Target at Arrows (Board #)",
-    min_value=1.0,
-    max_value=39.0,
-    value=15.0,
-    step=0.5,
-    help="Distance = 15 feet from foul line",
-)
-
-focal_target = st.sidebar.number_input(
-    "Focal Target at Pins (Board #)",
-    min_value=1.0,
-    max_value=39.0,
-    value=9.0,
-    step=0.5,
-    help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
-)
-
-# Quick Reference Board Guide
-st.sidebar.markdown(
-    """
-    **📌 Focal Pin Targets (Left - Center - Right):**
-    * **10 Pin:** 6 — **4** — 2
-    * **6 Pin:** 11 — **9** — 7
-    * **3 Pin:** 16 — **14** — 12
-    """
-)
-
-st.sidebar.markdown("---")
-st.sidebar.header("2. Breakpoint & Stance")
-
-breakpoint_dist = st.sidebar.slider(
-    "Breakpoint Distance (Feet)",
-    min_value=30.0,
-    max_value=55.0,
-    value=42.0,
-    step=1.0,
-    help="Distance down the lane where the oil ends / ball hooks.",
-)
-
-slide_foot_offset = st.sidebar.slider(
-    "Inside Foot Offset (Boards)",
-    min_value=3.0,
-    max_value=7.0,
-    value=5.0,
-    step=0.5,
-    help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
-)
+# --- DEFAULT VALUES / SESSION STATE INITIALIZATION ---
+if "arrow_target" not in st.session_state:
+    st.session_state.arrow_target = 15.0
+if "focal_target" not in st.session_state:
+    st.session_state.focal_target = 9.0
+if "breakpoint_dist" not in st.session_state:
+    st.session_state.breakpoint_dist = 42.0
+if "slide_foot_offset" not in st.session_state:
+    st.session_state.slide_foot_offset = 5.0
 
 # --- CALCULATIONS ---
-# 1. Standard Del Warren 3-Point Formula
-board_diff = arrow_target - focal_target
+board_diff = st.session_state.arrow_target - st.session_state.focal_target
 laydown_offset = board_diff / 3.0
-laydown_board = arrow_target + laydown_offset
-slide_board = laydown_board + slide_foot_offset
+laydown_board = st.session_state.arrow_target + laydown_offset
+slide_board = laydown_board + st.session_state.slide_foot_offset
 
-# 2. Linear Interpolation for Breakpoint
-slope = (focal_target - laydown_board) / 60.0
-breakpoint_board = laydown_board + (slope * breakpoint_dist)
+slope = (st.session_state.focal_target - laydown_board) / 60.0
+breakpoint_board = laydown_board + (slope * st.session_state.breakpoint_dist)
 
-# --- DISPLAY RESULTS ---
-st.subheader("Your Line Summary")
+# --- 1. TOP RESULT CARD (ALWAYS VISIBLE AT TOP) ---
+st.subheader("Your Calculated Line")
 
-col1, col2, col3, col4, col5 = st.columns(5)
+# Stack metrics into two mobile-friendly rows
+row1_col1, row1_col2, row1_col3 = st.columns(3)
+row1_col1.metric("1. Slide Foot", f"B{slide_board:.1f}")
+row1_col2.metric("2. Laydown", f"B{laydown_board:.1f}")
+row1_col3.metric("3. Arrow (15')", f"B{st.session_state.arrow_target:.1f}")
 
-col1.metric("1. Slide Foot", f"B{slide_board:.1f}")
-col2.metric("2. Laydown", f"B{laydown_board:.1f}")
-col3.metric("3. Arrow (15')", f"B{arrow_target:.1f}")
-col4.metric(f"4. Break ({breakpoint_dist:.0f}')", f"B{breakpoint_board:.1f}")
-col5.metric("5. Focal (60')", f"B{focal_target:.1f}")
+row2_col1, row2_col2 = st.columns(2)
+row2_col1.metric(
+    f"4. Break ({st.session_state.breakpoint_dist:.0f}')",
+    f"B{breakpoint_board:.1f}",
+)
+row2_col2.metric("5. Focal (60')", f"B{st.session_state.focal_target:.1f}")
+
+st.info(
+    f"**Full Trajectory:**\n\n"
+    f"Foot **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{st.session_state.arrow_target:.1f}** ➔ Break **{breakpoint_board:.1f}** (@{st.session_state.breakpoint_dist:.0f}') ➔ Pin **{st.session_state.focal_target:.1f}**"
+)
 
 st.markdown("---")
 
-st.info(
-    f"**Quick Reference:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target:.1f}** ➔ Breakpoint **{breakpoint_board:.1f}** @ {breakpoint_dist:.0f}' ➔ Pins **{focal_target:.1f}**"
-)
+# --- 2. MAIN PAGE INPUT CONTROLS (EXPANDABLES FOR MOBILE SCROLLING) ---
+st.subheader("Adjust Your Targets")
+
+# INPUT GROUP 1: BOARD TARGETS
+with st.expander("🎯 Target Boards (Arrow & Focal)", expanded=True):
+    st.number_input(
+        "Target at Arrows (Board #)",
+        min_value=1.0,
+        max_value=39.0,
+        step=0.5,
+        key="arrow_target",
+        help="Distance = 15 feet from foul line",
+    )
+
+    st.number_input(
+        "Focal Target at Pins (Board #)",
+        min_value=1.0,
+        max_value=39.0,
+        step=0.5,
+        key="focal_target",
+        help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
+    )
+
+    # Quick Reference Box inside the expander
+    st.markdown(
+        """
+        > **📌 Focal Pin Board Guide (Left - Center - Right):**
+        > * **10 Pin:** 6 — **4** — 2
+        > * **6 Pin:** 11 — **9** — 7
+        > * **3 Pin:** 16 — **14** — 12
+        """
+    )
+
+# INPUT GROUP 2: BREAKPOINT & STANCE
+with st.expander("📏 Breakpoint & Stance Settings", expanded=False):
+    st.slider(
+        "Breakpoint Distance (Feet)",
+        min_value=30.0,
+        max_value=55.0,
+        step=1.0,
+        key="breakpoint_dist",
+        help="Distance down the lane where the oil ends / ball hooks.",
+    )
+
+    st.slider(
+        "Inside Foot Offset (Boards)",
+        min_value=3.0,
+        max_value=7.0,
+        step=0.5,
+        key="slide_foot_offset",
+        help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
+    )
