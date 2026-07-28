@@ -5,7 +5,7 @@ import streamlit as st
 # Page Configuration
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="wide")
 
-st.title("🎳 3-Point Targeting & Lane Calculator")
+st.title(" bowling 3-Point Targeting & Lane Calculator")
 st.write(
     "Based on Del Warren's Kegel 3-Point Targeting System ($3:1$ Expansion Ratio)"
 )
@@ -128,35 +128,24 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         fontweight="bold",
     )
 
+    # 60 ft line marker
+    ax.axhline(y=60, color="black", linestyle="--", linewidth=1, zorder=3, alpha=0.5)
+    ax.text(
+        lane_width_ft / 2,
+        59.2,
+        "PIN DECK (60 FT)",
+        ha="center",
+        va="top",
+        fontsize=7,
+        color="black",
+        fontweight="bold",
+        alpha=0.6,
+    )
+
     # --- TARGET DOTS & ARROWS ---
     for b in [5, 10, 15, 20, 25, 30, 35]:
         ax.plot(b2x(b), 7, "o", color="#8b5a2b", markersize=3, zorder=3)
         ax.plot(b2x(b), 15, "^", color="#8b5a2b", markersize=5, zorder=3)
-
-    # --- PIN DECK (Pins correctly mapped from Board 1 Right to 39 Left) ---
-    pin_boards = {
-        "1": (20, 60.0),
-        "2": (25, 60.866),
-        "3": (15, 60.866),
-        "4": (30, 61.732),
-        "5": (20, 61.732),
-        "6": (10, 61.732),  # Board 9-10 (Right side)
-        "7": (35, 62.598),
-        "8": (25, 62.598),
-        "9": (15, 62.598),
-        "10": (5, 62.598),  # Board 4-5 (Far Right)
-    }
-
-    for p_num, (p_board, p_dist) in pin_boards.items():
-        ax.plot(
-            b2x(p_board),
-            p_dist,
-            "o",
-            color="white",
-            markeredgecolor="black",
-            markersize=7,
-            zorder=4,
-        )
 
     # --- TRAJECTORY LINE ---
     x_slide = b2x(slide)
