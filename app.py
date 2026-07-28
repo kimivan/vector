@@ -5,7 +5,7 @@ import streamlit as st
 # Page Configuration
 st.set_page_config(page_title="3-Point Targeting Calculator", layout="wide")
 
-st.title(" bowling 3-Point Targeting & Lane Calculator")
+st.title("🎳 3-Point Targeting & Lane Calculator")
 st.write(
     "Based on Del Warren's Kegel 3-Point Targeting System ($3:1$ Expansion Ratio)"
 )
@@ -71,7 +71,8 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
     def b2x(board_num):
         return (39.0 - board_num) * FEET_PER_BOARD
 
-    fig, ax = plt.subplots(figsize=(5, 11))
+    # Narrow figure width to match tall, skinny aspect ratio
+    fig, ax = plt.subplots(figsize=(3.5, 12))
 
     # --- LANE STRUCTURE ---
     lane_bg = patches.Rectangle(
@@ -123,7 +124,7 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         "FOUL LINE",
         ha="center",
         va="bottom",
-        fontsize=7,
+        fontsize=6,
         color="crimson",
         fontweight="bold",
     )
@@ -136,7 +137,7 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         "PIN DECK (60 FT)",
         ha="center",
         va="top",
-        fontsize=7,
+        fontsize=6,
         color="black",
         fontweight="bold",
         alpha=0.6,
@@ -144,8 +145,8 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
 
     # --- TARGET DOTS & ARROWS ---
     for b in [5, 10, 15, 20, 25, 30, 35]:
-        ax.plot(b2x(b), 7, "o", color="#8b5a2b", markersize=3, zorder=3)
-        ax.plot(b2x(b), 15, "^", color="#8b5a2b", markersize=5, zorder=3)
+        ax.plot(b2x(b), 7, "o", color="#8b5a2b", markersize=2.5, zorder=3)
+        ax.plot(b2x(b), 15, "^", color="#8b5a2b", markersize=4, zorder=3)
 
     # --- TRAJECTORY LINE ---
     x_slide = b2x(slide)
@@ -157,83 +158,88 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         [x_laydown, x_arrow, x_focal],
         [0, 15, 60],
         color="#0055ff",
-        linewidth=2.5,
+        linewidth=2,
         zorder=5,
     )
 
     # --- TARGET DOTS WITH IN-LINE BOARD CALLOUTS ---
     # 1. Slide Foot
     ax.scatter(
-        [x_slide], [-2.0], color="black", marker="s", s=45, zorder=6
+        [x_slide], [-2.0], color="black", marker="s", s=35, zorder=6
     )
     ax.annotate(
         f"Foot: B{slide:.1f}",
         (x_slide, -2.0),
         textcoords="offset points",
-        xytext=(8, -3),
-        fontsize=8,
+        xytext=(6, -3),
+        fontsize=7,
         fontweight="bold",
         zorder=7,
     )
 
     # 2. Laydown
-    ax.scatter([x_laydown], [0], color="crimson", s=55, zorder=6)
+    ax.scatter([x_laydown], [0], color="crimson", s=40, zorder=6)
     ax.annotate(
         f"Laydown: B{laydown:.1f}",
         (x_laydown, 0),
         textcoords="offset points",
-        xytext=(8, -3),
-        fontsize=8,
+        xytext=(6, -3),
+        fontsize=7,
         color="crimson",
         fontweight="bold",
         zorder=7,
     )
 
     # 3. Arrow
-    ax.scatter([x_arrow], [15], color="darkorange", s=55, zorder=6)
+    ax.scatter([x_arrow], [15], color="darkorange", s=40, zorder=6)
     ax.annotate(
         f"Arrow: B{arrow:.1f}",
         (x_arrow, 15),
         textcoords="offset points",
-        xytext=(8, -3),
-        fontsize=8,
+        xytext=(6, -3),
+        fontsize=7,
         color="darkorange",
         fontweight="bold",
         zorder=7,
     )
 
     # 4. Focal Point
-    ax.scatter([x_focal], [60], color="green", s=55, zorder=6)
+    ax.scatter([x_focal], [60], color="green", s=40, zorder=6)
     ax.annotate(
         f"Focal: B{focal:.1f}",
         (x_focal, 60),
         textcoords="offset points",
-        xytext=(8, -3),
-        fontsize=8,
+        xytext=(6, -3),
+        fontsize=7,
         color="green",
         fontweight="bold",
         zorder=7,
     )
 
-    # --- AXIS FORMATTING & ASPECT RATIO LOCK ---
-    ax.set_ylim(-6, 64)
+    # --- AXIS FORMATTING & TRUE ASPECT RATIO LOCK ---
+    ax.set_aspect('equal', adjustable='box')  # Forces true 1:1 physical proportion
+    ax.set_ylim(-8, 66)
     ax.set_xlim(-gutter_width_ft - 0.2, lane_width_ft + gutter_width_ft + 0.2)
 
     # Ticks setup (Board 1 on far Right, Board 39 on Left)
-    board_ticks = [1, 5, 10, 15, 20, 25, 30, 35, 39]
+    board_ticks = [1, 10, 20, 30, 39]
     ax.set_xticks([b2x(b) for b in board_ticks])
-    ax.set_xticklabels([str(b) for b in board_ticks])
+    ax.set_xticklabels([str(b) for b in board_ticks], fontsize=8)
 
-    ax.set_xlabel("Board # (Right 1 ◄ 39 Left)", fontsize=9)
-    ax.set_ylabel("Distance from Foul Line (Feet)", fontsize=9)
+    ax.set_xlabel("Board # (Right 1 ◄ 39 Left)", fontsize=8)
+    ax.set_ylabel("Distance from Foul Line (Feet)", fontsize=8)
     ax.grid(True, which="both", linestyle=":", alpha=0.3)
 
     plt.tight_layout()
     return fig
 
 # --- RENDER DIAGRAM ---
-st.subheader("Lane Diagram with Live Board Readouts")
+st.subheader("Lane Diagram (True Physical Scale)")
 fig = plot_lane_trajectory(
     slide_board, laydown_board, arrow_target, focal_target
 )
-st.pyplot(fig)
+
+# Centered layout using Streamlit columns
+left_pad, main_col, right_pad = st.columns([1, 2, 1])
+with main_col:
+    st.pyplot(fig)
