@@ -73,7 +73,7 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
     lane_width_ft = 39 * FEET_PER_BOARD  # ~3.46 ft
     gutter_width_ft = 9.25 / 12.0  # 9.25 inches -> 0.77 ft
 
-    fig, ax = plt.subplots(figsize=(4, 11))
+    fig, ax = plt.subplots(figsize=(4.5, 11))
 
     # --- DRAW LANE STRUCTURE ---
     lane_bg = patches.Rectangle(
@@ -118,7 +118,7 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
     ax.add_patch(r_gutter)
     ax.add_patch(l_gutter)
 
-    ax.axhline(y=0, color="red", linewidth=2.5, zorder=3, label="Foul Line")
+    ax.axhline(y=0, color="red", linewidth=2.5, zorder=3, label="Foul Line (0 ft)")
     ax.axhline(
         y=42,
         color="#008b8b",
@@ -126,7 +126,7 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         linewidth=1,
         alpha=0.7,
         zorder=2,
-        label="Pattern End (42 ft)",
+        label="Pattern Exit (42 ft)",
     )
 
     # --- TARGET MARKINGS ---
@@ -148,18 +148,18 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
             zorder=3,
         )
 
-    # --- PIN DECK AT 60 FT (Board numbers correct from right to left) ---
+    # --- PIN DECK AT 60 FT ---
     pin_locations = {
         "1": (20, 60.0),
-        "2": (25, 60.866),  # 2-pin is to the left (higher board #)
-        "3": (15, 60.866),  # 3-pin is to the right (lower board #)
+        "2": (25, 60.866),
+        "3": (15, 60.866),
         "4": (30, 61.732),
         "5": (20, 61.732),
-        "6": (10, 61.732),  # 6-pin center is ~board 9-10
+        "6": (10, 61.732),
         "7": (35, 62.598),
         "8": (25, 62.598),
         "9": (15, 62.598),
-        "10": (5, 62.598),  # 10-pin is on board 4-5 on far right
+        "10": (5, 62.598),
     }
 
     for p_num, (p_board, p_dist) in pin_locations.items():
@@ -179,50 +179,53 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
         [0, 15, 60],
         color="#0055ff",
         linewidth=2.5,
-        label="Ball Path",
+        label="Ball Path Line",
         zorder=5,
+    )
+
+    # --- KEY TARGET POINTS WITH DETAILED LEGEND LABELS ---
+    ax.scatter(
+        [y_slide_ft],
+        [-1.0],
+        color="black",
+        marker="s",
+        s=50,
+        zorder=6,
+        label=f"Slide Foot: Board {slide:.1f}",
     )
 
     ax.scatter(
         [y_laydown_ft],
         [0],
         color="crimson",
-        s=50,
+        s=60,
         zorder=6,
-        label=f"Laydown ({laydown:.1f})",
+        label=f"Foul Line Laydown: Board {laydown:.1f}",
     )
+
     ax.scatter(
         [y_arrow_ft],
         [15],
         color="orange",
-        s=50,
+        s=60,
         zorder=6,
-        label=f"Arrow ({arrow:.1f})",
+        label=f"Target Arrow: Board {arrow:.1f}",
     )
+
     ax.scatter(
         [y_focal_ft],
         [60],
         color="green",
-        s=50,
+        s=60,
         zorder=6,
-        label=f"Focal ({focal:.1f})",
-    )
-
-    ax.scatter(
-        [y_slide_ft],
-        [-1.0],
-        color="black",
-        marker="s",
-        s=40,
-        zorder=6,
-        label=f"Slide Foot ({slide:.1f})",
+        label=f"Focal Point (Pins): Board {focal:.1f}",
     )
 
     # --- AXES & ORIENTATION ---
     ax.set_ylim(-5, 64)
     ax.set_xlim(-gutter_width_ft - 0.2, lane_width_ft + gutter_width_ft + 0.2)
 
-    # INVERT X-AXIS: So Board 1 (Right Gutter) is on the right, Board 39 (Left Gutter) on the left
+    # INVERT X-AXIS: Board 1 (Right Gutter) on right, Board 39 (Left Gutter) on left
     ax.invert_xaxis()
 
     board_ticks = [1, 5, 10, 15, 20, 25, 30, 35, 39]
@@ -230,17 +233,27 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
     ax.set_xticks(board_positions)
     ax.set_xticklabels([str(b) for b in board_ticks])
 
-    ax.set_xlabel("Board Number (Right 1 ◄ 39 Left)", fontsize=9)
+    ax.set_xlabel("Lane Board Number (Right 1 ◄ 39 Left)", fontsize=9)
     ax.set_ylabel("Distance from Foul Line (Feet)", fontsize=9)
 
     ax.grid(True, which="both", linestyle=":", alpha=0.3)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.08), ncol=2, fontsize=8)
+
+    # EXPLICIT LEGEND DISPLAY
+    ax.legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.07),
+        ncol=1,
+        fontsize=9,
+        frameon=True,
+        facecolor="#ffffff",
+        edgecolor="gray",
+    )
 
     plt.tight_layout()
     return fig
 
 # --- RENDER DIAGRAM ---
-st.subheader("Scaled Lane Diagram")
+st.subheader("Scaled Lane Diagram with Target Legend")
 fig = plot_lane_trajectory(
     slide_board, laydown_board, arrow_target, focal_target
 )
