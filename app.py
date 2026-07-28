@@ -1,7 +1,65 @@
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
+
+# Set page layout
+st.set_page_config(page_title="3-Point Targeting Calculator", layout="wide")
+
+st.title("🎳 3-Point Targeting & Lane Calculator")
+st.write(
+    "Based on Del Warren's Kegel 3-Point Targeting System ($3:1$ Expansion Ratio)"
+)
+
+# --- SIDEBAR INPUTS ---
+st.sidebar.header("Target Inputs")
+
+arrow_target = st.sidebar.number_input(
+    "Target at Arrows (Board #)",
+    min_value=1.0,
+    max_value=39.0,
+    value=15.0,
+    step=0.5,
+)
+
+focal_target = st.sidebar.number_input(
+    "Target at Pins / Focal Point (Board #)",
+    min_value=1.0,
+    max_value=39.0,
+    value=9.0,
+    step=0.5,
+    help="e.g., Center of 6-Pin = 9, Center of 10-Pin = 4, Headpin = 20",
+)
+
+slide_foot_offset = st.sidebar.slider(
+    "Inside Foot Offset (Boards)",
+    min_value=3.0,
+    max_value=7.0,
+    value=5.0,
+    step=0.5,
+    help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
+)
+
+# --- CALCULATIONS ---
+board_diff = arrow_target - focal_target
+laydown_offset = board_diff / 3.0
+laydown_board = arrow_target + laydown_offset
+slide_board = laydown_board + slide_foot_offset
+
+# --- MAIN DISPLAY: CALCULATED LINE ---
+st.subheader("Your Calculated Line")
+
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("1. Slide Board (Foot)", f"{slide_board:.1f}")
+col2.metric("2. Laydown Board", f"{laydown_board:.1f}")
+col3.metric("3. Target Arrow", f"{arrow_target:.1f}")
+col4.metric("4. Pin / Focal Target", f"{focal_target:.1f}")
+
+st.info(
+    f"**Full Line Summary:** Slide **{slide_board:.1f}** ➔ Laydown **{laydown_board:.1f}** ➔ Arrow **{arrow_target:.1f}** ➔ Pins **{focal_target:.1f}**"
+)
+
+# --- VISUALIZATION (LANE DIAGRAM) ---
+st.subheader("Scaled Lane Trajectory Diagram")
 
 
 def plot_lane_trajectory(slide, laydown, arrow, focal):
@@ -198,3 +256,10 @@ def plot_lane_trajectory(slide, laydown, arrow, focal):
 
     plt.tight_layout()
     return fig
+
+
+# Render Plot
+fig = plot_lane_trajectory(
+    slide_board, laydown_board, arrow_target, focal_target
+)
+st.pyplot(fig)
