@@ -110,11 +110,11 @@ def draw_lane():
     # Board to Feet Conversion Factor: (41.5 inches / 39 boards) / 12 inches per foot
     BOARD_TO_FEET = (41.5 / 39.0) / 12.0
 
-    fig, ax = plt.subplots(figsize=(15, 2.0), facecolor="#111827")
+    fig, ax = plt.subplots(figsize=(15, 2.2), facecolor="#111827")
     ax.set_facecolor("#1f2937")
 
     # True 1:1 Physical Geometry
-    ax.set_ylim(0.0, 40.0 * BOARD_TO_FEET)
+    ax.set_ylim(-0.2 * BOARD_TO_FEET, 40.2 * BOARD_TO_FEET)
     ax.set_xlim(-2, 62)
     ax.set_aspect("equal")
 
@@ -165,6 +165,65 @@ def draw_lane():
     ax.plot(15, b2y(st.session_state.arrow_target), "D", color="#fbbf24", markersize=3.5)
     ax.plot(st.session_state.breakpoint_dist, b2y(breakpoint_board), "X", color="#a855f7", markersize=4.5)
     ax.plot(60, b2y(st.session_state.focal_target), "o", color="#22c55e", markersize=4.5)
+
+    # --- POINT ANNOTATIONS (BOARD NUMBERS) ---
+    bbox_style = dict(boxstyle="round,pad=0.2", facecolor="#111827", edgecolor="none", alpha=0.85)
+
+    # Laydown Label
+    ax.annotate(
+        f"L: {laydown_board:.1f}",
+        xy=(0, b2y(laydown_board)),
+        xytext=(0, 10),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color="#38bdf8",
+        fontweight="bold",
+        bbox=bbox_style,
+    )
+
+    # Arrow Target Label
+    ax.annotate(
+        f"A: {st.session_state.arrow_target:.0f}",
+        xy=(15, b2y(st.session_state.arrow_target)),
+        xytext=(0, 10),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color="#fbbf24",
+        fontweight="bold",
+        bbox=bbox_style,
+    )
+
+    # Breakpoint Label
+    ax.annotate(
+        f"BP: {breakpoint_board:.1f}",
+        xy=(st.session_state.breakpoint_dist, b2y(breakpoint_board)),
+        xytext=(0, 10),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color="#a855f7",
+        fontweight="bold",
+        bbox=bbox_style,
+    )
+
+    # Focal Target Label
+    ax.annotate(
+        f"F: {st.session_state.focal_target:.0f}",
+        xy=(60, b2y(st.session_state.focal_target)),
+        xytext=(0, 10),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+        fontsize=7,
+        color="#22c55e",
+        fontweight="bold",
+        bbox=bbox_style,
+    )
 
     # Axes Formatting
     ax.set_xlabel("Distance Down Lane (Feet)", color="#9ca3af", fontsize=8)
