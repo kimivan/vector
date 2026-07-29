@@ -5,7 +5,7 @@ import streamlit as st
 # Page Configuration - Wide Layout for Full Screen Width
 st.set_page_config(
     page_title="3-Point Targeting",
-    page_icon=" bowling ",
+    page_icon="🎳",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -110,7 +110,7 @@ def draw_lane():
     # Board to Feet Conversion Factor: (41.5 inches / 39 boards) / 12 inches per foot
     BOARD_TO_FEET = (41.5 / 39.0) / 12.0
 
-    fig, ax = plt.subplots(figsize=(15, 2.5), facecolor="#111827")
+    fig, ax = plt.subplots(figsize=(15, 2.0), facecolor="#111827")
     ax.set_facecolor("#1f2937")
 
     # True 1:1 Physical Geometry
@@ -131,12 +131,10 @@ def draw_lane():
     ax.axhspan(b2y(39), b2y(40), color="#374151", alpha=0.8)
 
     # Foul Line (0 ft)
-    ax.axvline(0, color="#ef4444", linewidth=1.5, label="Foul Line")
+    ax.axvline(0, color="#ef4444", linewidth=1.5)
 
-    # Arrow Markers at 15 Feet
+    # Arrows Distance Indicator (15 ft)
     ax.axvline(15, color="#f59e0b", linestyle="--", alpha=0.3)
-    for b in [5, 10, 15, 20, 25, 30, 35]:
-        ax.plot(15, b2y(b), "^", color="#f59e0b", markersize=3)
 
     # Breakpoint Distance Marker
     ax.axvline(
@@ -156,45 +154,17 @@ def draw_lane():
     x_hook = [st.session_state.breakpoint_dist, 60]
     y_hook = [b2y(breakpoint_board), b2y(st.session_state.focal_target)]
 
-    # Skid Phase (Blue)
-    ax.plot(x_oil, y_oil, color="#60a5fa", linewidth=1.5, label="Skid Phase")
+    # Skid Phase Line
+    ax.plot(x_oil, y_oil, color="#60a5fa", linewidth=1.5)
 
-    # Hook Phase (Dashed Red/Pink)
-    ax.plot(
-        x_hook,
-        y_hook,
-        color="#f43f5e",
-        linewidth=1.5,
-        linestyle="--",
-        label="Hook Phase",
-    )
+    # Hook Phase Line
+    ax.plot(x_hook, y_hook, color="#f43f5e", linewidth=1.5, linestyle="--")
 
     # Key Target Points
-    ax.plot(0, b2y(laydown_board), "s", color="#38bdf8", markersize=3.5, label="Laydown")
-    ax.plot(
-        15,
-        b2y(st.session_state.arrow_target),
-        "D",
-        color="#fbbf24",
-        markersize=3.5,
-        label="Arrow",
-    )
-    ax.plot(
-        st.session_state.breakpoint_dist,
-        b2y(breakpoint_board),
-        "X",
-        color="#a855f7",
-        markersize=4.5,
-        label="Breakpoint",
-    )
-    ax.plot(
-        60,
-        b2y(st.session_state.focal_target),
-        "o",
-        color="#22c55e",
-        markersize=4.5,
-        label="Focal Target",
-    )
+    ax.plot(0, b2y(laydown_board), "s", color="#38bdf8", markersize=3.5)
+    ax.plot(15, b2y(st.session_state.arrow_target), "D", color="#fbbf24", markersize=3.5)
+    ax.plot(st.session_state.breakpoint_dist, b2y(breakpoint_board), "X", color="#a855f7", markersize=4.5)
+    ax.plot(60, b2y(st.session_state.focal_target), "o", color="#22c55e", markersize=4.5)
 
     # Axes Formatting
     ax.set_xlabel("Distance Down Lane (Feet)", color="#9ca3af", fontsize=8)
@@ -208,15 +178,6 @@ def draw_lane():
     ax.grid(True, linestyle=":", alpha=0.15, color="#ffffff")
     for spine in ax.spines.values():
         spine.set_color("#374151")
-
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.45),
-        ncol=5,
-        frameon=False,
-        fontsize=8,
-        labelcolor="#e5e7eb",
-    )
 
     plt.tight_layout()
     return fig
