@@ -2,15 +2,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 
-# Page Configuration - Mobile First
+# Page Configuration - Wide Layout for Full Screen Width
 st.set_page_config(
     page_title="3-Point Targeting",
-    page_icon="🎳",
-    layout="centered",
+    page_icon=" bowling ",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# --- CUSTOM MOBILE STYLING ---
+# --- CUSTOM STYLING ---
 st.markdown(
     """
     <style>
@@ -38,48 +38,49 @@ if "breakpoint_dist" not in st.session_state:
     st.session_state.breakpoint_dist = 42.0
 if "slide_foot_offset" not in st.session_state:
     st.session_state.slide_foot_offset = 5.0
-if "true_scale" not in st.session_state:
-    st.session_state.true_scale = False
 
 # --- 1. INPUT CONTROLS ---
 st.subheader("Targets")
 
 with st.container(border=True):
-    st.number_input(
-        "Target at Arrows (Board #)",
-        min_value=1.0,
-        max_value=39.0,
-        step=1.0,
-        key="arrow_target",
-        help="Distance = 15 feet from foul line",
-    )
+    col1, col2 = st.columns(2)
+    with col1:
+        st.number_input(
+            "Target at Arrows (Board #)",
+            min_value=1.0,
+            max_value=39.0,
+            step=1.0,
+            key="arrow_target",
+            help="Distance = 15 feet from foul line",
+        )
 
-    st.number_input(
-        "Focal Target at Pins (Board #)",
-        min_value=1.0,
-        max_value=39.0,
-        step=1.0,
-        key="focal_target",
-        help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
-    )
+        st.number_input(
+            "Focal Target at Pins (Board #)",
+            min_value=1.0,
+            max_value=39.0,
+            step=1.0,
+            key="focal_target",
+            help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
+        )
 
-    st.slider(
-        "Breakpoint Distance (Feet)",
-        min_value=30.0,
-        max_value=55.0,
-        step=1.0,
-        key="breakpoint_dist",
-        help="Distance down the lane where the oil ends / ball hooks.",
-    )
+    with col2:
+        st.slider(
+            "Breakpoint Distance (Feet)",
+            min_value=30.0,
+            max_value=55.0,
+            step=1.0,
+            key="breakpoint_dist",
+            help="Distance down the lane where the oil ends / ball hooks.",
+        )
 
-    st.slider(
-        "Inside Foot Offset (Boards)",
-        min_value=3.0,
-        max_value=7.0,
-        step=1.0,
-        key="slide_foot_offset",
-        help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
-    )
+        st.slider(
+            "Inside Foot Offset (Boards)",
+            min_value=3.0,
+            max_value=7.0,
+            step=1.0,
+            key="slide_foot_offset",
+            help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
+        )
 
 # --- CALCULATIONS ---
 board_diff = st.session_state.arrow_target - st.session_state.focal_target
@@ -101,43 +102,24 @@ st.success(
 
 st.markdown("---")
 
-# --- 3. VISUAL LANE DIAGRAM ---
-st.subheader("Lane Trajectory")
-
-# Scale Toggle
-st.toggle(
-    "True Spatial Ratio (1:1 Geometry)",
-    key="true_scale",
-    help="When enabled, renders exact 60ft x 41.5in physical proportions (extremely thin on phones).",
-)
+# --- 3. VISUAL LANE DIAGRAM (TRUE 1:1 GEOMETRY) ---
+st.subheader("Lane Trajectory (True Spatial Proportions)")
 
 
-def draw_lane(true_scale=False):
-    # Width of 1 board in feet = (41.5 inches / 39 boards) / 12 inches per foot
+def draw_lane():
+    # Board to Feet Conversion Factor: (41.5 inches / 39 boards) / 12 inches per foot
     BOARD_TO_FEET = (41.5 / 39.0) / 12.0
 
-    fig, ax = plt.subplots(
-        figsize=(10, 2.5 if true_scale else 3.8), facecolor="#111827"
-    )
+    fig, ax = plt.subplots(figsize=(15, 2.5), facecolor="#111827")
     ax.set_facecolor("#1f2937")
 
-    if true_scale:
-        # Physical feet dimensions
-        y_min, y_max = 0.0, 40.0 * BOARD_TO_FEET
-        ax.set_ylim(y_min, y_max)
-        ax.set_xlim(-2, 62)
-        ax.set_aspect("equal")  # 1:1 Physical Spatial Geometry
+    # True 1:1 Physical Geometry
+    ax.set_ylim(0.0, 40.0 * BOARD_TO_FEET)
+    ax.set_xlim(-2, 62)
+    ax.set_aspect("equal")
 
-        def b2y(b):
-            return b * BOARD_TO_FEET
-
-    else:
-        # Board units dimensions (Exaggerated board width for readability)
-        ax.set_ylim(0, 40)
-        ax.set_xlim(-2, 62)
-
-        def b2y(b):
-            return b
+    def b2y(b):
+        return b * BOARD_TO_FEET
 
     # Fill Lane Wood Area (Boards 1 to 39)
     ax.axhspan(
@@ -149,30 +131,23 @@ def draw_lane(true_scale=False):
     ax.axhspan(b2y(39), b2y(40), color="#374151", alpha=0.8)
 
     # Foul Line (0 ft)
-    ax.axvline(0, color="#ef4444", linewidth=2.0, label="Foul Line")
+    ax.axvline(0, color="#ef4444", linewidth=1.5, label="Foul Line")
 
-    # Arrows (15 ft) - Key arrows at boards 5, 10, 15, 20, 25, 30, 35
+    # Arrow Markers at 15 Feet
     ax.axvline(15, color="#f59e0b", linestyle="--", alpha=0.3)
     for b in [5, 10, 15, 20, 25, 30, 35]:
-        ax.plot(15, b2y(b), "^", color="#f59e0b", markersize=5 if not true_scale else 3)
+        ax.plot(15, b2y(b), "^", color="#f59e0b", markersize=3)
 
-    # Breakpoint Distance Line
+    # Breakpoint Distance Marker
     ax.axvline(
         st.session_state.breakpoint_dist,
         color="#3b82f6",
         linestyle=":",
-        alpha=0.5,
+        alpha=0.4,
     )
 
     # Head Pin Position (60 ft, Board 20)
-    ax.plot(
-        60,
-        b2y(20),
-        "o",
-        color="#ffffff",
-        markersize=7 if not true_scale else 4,
-        markeredgecolor="#ef4444",
-    )
+    ax.plot(60, b2y(20), "o", color="#ffffff", markersize=4, markeredgecolor="#ef4444")
 
     # --- TRAJECTORY LINES ---
     x_oil = [0, st.session_state.breakpoint_dist]
@@ -181,28 +156,27 @@ def draw_lane(true_scale=False):
     x_hook = [st.session_state.breakpoint_dist, 60]
     y_hook = [b2y(breakpoint_board), b2y(st.session_state.focal_target)]
 
-    # Oil/Skid Phase Trajectory Line
-    ax.plot(x_oil, y_oil, color="#60a5fa", linewidth=2.0, label="Skid Phase")
+    # Skid Phase (Blue)
+    ax.plot(x_oil, y_oil, color="#60a5fa", linewidth=1.5, label="Skid Phase")
 
-    # Hook Phase Trajectory Line
+    # Hook Phase (Dashed Red/Pink)
     ax.plot(
         x_hook,
         y_hook,
         color="#f43f5e",
-        linewidth=2.0,
+        linewidth=1.5,
         linestyle="--",
         label="Hook Phase",
     )
 
-    # Key Target Marker Points
-    ms = 6 if not true_scale else 3.5
-    ax.plot(0, b2y(laydown_board), "s", color="#38bdf8", markersize=ms, label="Laydown")
+    # Key Target Points
+    ax.plot(0, b2y(laydown_board), "s", color="#38bdf8", markersize=3.5, label="Laydown")
     ax.plot(
         15,
         b2y(st.session_state.arrow_target),
         "D",
         color="#fbbf24",
-        markersize=ms,
+        markersize=3.5,
         label="Arrow",
     )
     ax.plot(
@@ -210,7 +184,7 @@ def draw_lane(true_scale=False):
         b2y(breakpoint_board),
         "X",
         color="#a855f7",
-        markersize=ms + 1,
+        markersize=4.5,
         label="Breakpoint",
     )
     ax.plot(
@@ -218,36 +192,26 @@ def draw_lane(true_scale=False):
         b2y(st.session_state.focal_target),
         "o",
         color="#22c55e",
-        markersize=ms + 1,
+        markersize=4.5,
         label="Focal Target",
     )
 
-    # Styling Axes
-    ax.set_xlabel("Distance Down Lane (Feet)", color="#9ca3af", fontsize=9)
-    ax.set_ylabel(
-        "Width (Feet)" if true_scale else "Board Number (1-39)",
-        color="#9ca3af",
-        fontsize=9,
-    )
+    # Axes Formatting
+    ax.set_xlabel("Distance Down Lane (Feet)", color="#9ca3af", fontsize=8)
+    ax.set_ylabel("Width (Feet)", color="#9ca3af", fontsize=8)
     ax.tick_params(colors="#9ca3af", labelsize=8)
 
-    # Set Y-Ticks
-    if true_scale:
-        ax.set_yticks([b2y(1), b2y(10), b2y(20), b2y(30), b2y(39)])
-        ax.set_yticklabels(["B1", "B10", "B20", "B30", "B39"])
-    else:
-        ax.set_yticks([1, 10, 20, 30, 39])
-
+    ax.set_yticks([b2y(1), b2y(10), b2y(20), b2y(30), b2y(39)])
+    ax.set_yticklabels(["B1", "B10", "B20", "B30", "B39"])
     ax.set_xticks([0, 15, 30, st.session_state.breakpoint_dist, 60])
 
     ax.grid(True, linestyle=":", alpha=0.15, color="#ffffff")
     for spine in ax.spines.values():
         spine.set_color("#374151")
 
-    # Legend Alignment
     ax.legend(
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.35 if true_scale else -0.22),
+        bbox_to_anchor=(0.5, -0.45),
         ncol=5,
         frameon=False,
         fontsize=8,
@@ -258,7 +222,7 @@ def draw_lane(true_scale=False):
     return fig
 
 
-st.pyplot(draw_lane(st.session_state.true_scale), use_container_width=True)
+st.pyplot(draw_lane(), use_container_width=True)
 
 st.markdown("---")
 
