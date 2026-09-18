@@ -4,7 +4,7 @@ import streamlit as st
 # Page Configuration - Wide Layout for Full Screen Width
 st.set_page_config(
     page_title="3-Point Targeting",
-    page_icon="🎳",
+    page_icon=" bowling_ball ",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -93,23 +93,10 @@ laydown_board = st.session_state.arrow_target - (slope * 15.0)
 # 3. Slide Board Position: Laydown + Slide Gap
 slide_board = laydown_board + st.session_state.slide_foot_offset
 
-# 4. Focal Target (Pins at 60 ft) projected from the straight line trajectory
-focal_target = st.session_state.arrow_target + (slope * 45.0)
-
 # --- 2. FULL TRAJECTORY RESULTS ---
 st.success(
     f"Slide **{slide_board:.1f}** ➔ "
     f"Laydown **{laydown_board:.1f}** ➔ "
     f"Arrow **{st.session_state.arrow_target:.0f}** ➔ "
-    f"Break **{st.session_state.breakpoint_board:.0f}** (@ {st.session_state.breakpoint_dist:.0f}') ➔ "
-    f"Focal **{focal_target:.1f}**"
-)
-
-# --- 3. FOCAL PIN BOARD GUIDE ---
-st.markdown(
-    """
-    > **10 Pin:** 6 — **4** — 2  
-    > **6 Pin:** 11 — **9** — 7  
-    > **3 Pin:** 16 — **14** — 12
-    """
+    f"Break **{st.session_state.breakpoint_board:.0f}** (@ {st.session_state.breakpoint_dist:.0f}')"
 )
