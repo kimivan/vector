@@ -1,10 +1,9 @@
-import numpy as np
 import streamlit as st
 
 # Page Configuration - Wide Layout for Full Screen Width
 st.set_page_config(
     page_title="3-Point Targeting",
-    page_icon=" bowling_ball ",
+    page_icon="🎳",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -30,9 +29,9 @@ st.markdown(
 
 # --- DEFAULT VALUES / SESSION STATE INITIALIZATION ---
 if "arrow_target" not in st.session_state:
-    st.session_state.arrow_target = 15.0
+    st.session_state.arrow_target = 13.0
 if "breakpoint_board" not in st.session_state:
-    st.session_state.breakpoint_board = 10.0
+    st.session_state.breakpoint_board = 8.0
 if "breakpoint_dist" not in st.session_state:
     st.session_state.breakpoint_dist = 42.0
 if "slide_foot_offset" not in st.session_state:
@@ -82,15 +81,19 @@ with st.container(border=True):
         )
 
 # --- CALCULATIONS ---
-# 1. Trajectory Slope: Change in boards per foot between Arrows (15 ft) and Breakpoint
-slope = (st.session_state.breakpoint_board - st.session_state.arrow_target) / (
-    st.session_state.breakpoint_dist - 15.0
-)
+# 1. Delta between target board and breakpoint board
+board_delta = st.session_state.arrow_target - st.session_state.breakpoint_board
 
-# 2. Laydown Board: Extrapolate back to foul line (0 ft) from the Arrow (15 ft)
-laydown_board = st.session_state.arrow_target - (slope * 15.0)
+# 2. Delta between breakpoint distance and 15ft arrows
+dist_delta = st.session_state.breakpoint_dist - 15.0
 
-# 3. Slide Board Position: Laydown + Slide Gap
+# 3. Ratio per foot multiplied by 15ft
+foul_line_offset = (board_delta / dist_delta) * 15.0
+
+# 4. Laydown Board
+laydown_board = st.session_state.arrow_target + foul_line_offset
+
+# 5. Slide Position = Arrow Target + Foul Line Offset + Slide Gap
 slide_board = laydown_board + st.session_state.slide_foot_offset
 
 # --- 2. FULL TRAJECTORY RESULTS ---
