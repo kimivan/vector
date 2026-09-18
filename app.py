@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 
@@ -32,8 +31,8 @@ st.markdown(
 # --- DEFAULT VALUES / SESSION STATE INITIALIZATION ---
 if "arrow_target" not in st.session_state:
     st.session_state.arrow_target = 15.0
-if "focal_target" not in st.session_state:
-    st.session_state.focal_target = 9.0
+if "breakpoint_board" not in st.session_state:
+    st.session_state.breakpoint_board = 10.0
 if "breakpoint_dist" not in st.session_state:
     st.session_state.breakpoint_dist = 42.0
 if "slide_foot_offset" not in st.session_state:
@@ -51,16 +50,16 @@ with st.container(border=True):
             max_value=39.0,
             step=1.0,
             key="arrow_target",
-            help="Distance = 15 feet from foul line",
+            help="Target distance = 15 feet from foul line",
         )
 
         st.number_input(
-            "Focal Target at Pins (Board #)",
+            "Breakpoint Board #",
             min_value=1.0,
             max_value=39.0,
             step=1.0,
-            key="focal_target",
-            help="Target at 60 feet. e.g., Board 9 = Center of 6-Pin",
+            key="breakpoint_board",
+            help="Target board where the ball exits the oil pattern.",
         )
 
     with col2:
@@ -74,34 +73,39 @@ with st.container(border=True):
         )
 
         st.slider(
-            "Inside Foot Offset (Boards)",
+            "Slide / Laydown Gap (Boards)",
             min_value=3.0,
             max_value=7.0,
             step=1.0,
             key="slide_foot_offset",
-            help="Standard distance from inside of sliding foot to ball laydown is 5 boards.",
+            help="Distance from inside of sliding foot to ball laydown (Standard is 5 boards).",
         )
 
 # --- CALCULATIONS ---
-board_diff = st.session_state.arrow_target - st.session_state.focal_target
-laydown_offset = board_diff / 3.0
-laydown_board = st.session_state.arrow_target + laydown_offset
+# 1. Trajectory Slope: Change in boards per foot between Arrows (15 ft) and Breakpoint
+slope = (st.session_state.breakpoint_board - st.session_state.arrow_target) / (
+    st.session_state.breakpoint_dist - 15.0
+)
+
+# 2. Laydown Board: Extrapolate back to foul line (0 ft) from the Arrow (15 ft)
+laydown_board = st.session_state.arrow_target - (slope * 15.0)
+
+# 3. Slide Board Position: Laydown + Slide Gap
 slide_board = laydown_board + st.session_state.slide_foot_offset
 
-slope = (st.session_state.focal_target - laydown_board) / 60.0
-breakpoint_board = laydown_board + (slope * st.session_state.breakpoint_dist)
+# 4. Focal Target (Pins at 60 ft) projected from the straight line trajectory
+focal_target = st.session_state.arrow_target + (slope * 45.0)
 
 # --- 2. FULL TRAJECTORY RESULTS ---
 st.success(
     f"Slide **{slide_board:.1f}** ➔ "
     f"Laydown **{laydown_board:.1f}** ➔ "
     f"Arrow **{st.session_state.arrow_target:.0f}** ➔ "
-    f"Break **{breakpoint_board:.1f}** ➔ "
-    f"Focal **{st.session_state.focal_target:.0f}**"
+    f"Break **{st.session_state.breakpoint_board:.0f}** (@ {st.session_state.breakpoint_dist:.0f}') ➔ "
+    f"Focal **{focal_target:.1f}**"
 )
 
-
-# --- 4. FOCAL PIN BOARD GUIDE ---
+# --- 3. FOCAL PIN BOARD GUIDE ---
 st.markdown(
     """
     > **10 Pin:** 6 — **4** — 2  
