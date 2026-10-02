@@ -1,9 +1,10 @@
+import math
 import streamlit as st
 
 # Page Configuration - Wide Layout for Full Screen Width
 st.set_page_config(
     page_title="3-Point Targeting",
-    page_icon="🎳",
+    page_icon=" bowling ",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -90,16 +91,43 @@ dist_delta = st.session_state.breakpoint_dist - 15.0
 # 3. Ratio per foot multiplied by 15ft
 foul_line_offset = (board_delta / dist_delta) * 15.0
 
-# 4. Laydown Board
+# 4. Laydown Board (at 0 ft)
 laydown_board = st.session_state.arrow_target + foul_line_offset
 
-# 5. Slide Position = Arrow Target + Foul Line Offset + Slide Gap
+# 5. Slide Position
 slide_board = laydown_board + st.session_state.slide_foot_offset
 
-# --- 2. FULL TRAJECTORY RESULTS ---
+# 6. Focal Board Projection at 60 feet
+focal_board = laydown_board + (
+    (st.session_state.breakpoint_board - laydown_board)
+    / st.session_state.breakpoint_dist
+) * 60.0
+
+# 7. Launch Angle (Degrees)
+# 1 board = 1.067 inches = 0.0889 feet
+board_width_ft = 0.0889
+board_diff_ft = (
+    st.session_state.breakpoint_board - laydown_board
+) * board_width_ft
+launch_angle = math.degrees(
+    math.atan(board_diff_ft / st.session_state.breakpoint_dist)
+)
+
+# --- 2. TRAJECTORY & FOCAL METRICS RESULTS ---
 st.success(
     f"Slide **{slide_board:.1f}** ➔ "
     f"Laydown **{laydown_board:.1f}** ➔ "
     f"Arrow **{st.session_state.arrow_target:.0f}** ➔ "
     f"Break **{st.session_state.breakpoint_board:.0f}** (@ {st.session_state.breakpoint_dist:.0f}')"
 )
+
+# Render Launch Angle and Focal Point Metrics
+metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
+with metric_col1:
+    st.metric("Slide Board", f"{slide_board:.1f}")
+with metric_col2:
+    st.metric("Arrow Board", f"{st.session_state.arrow_target:.1f}")
+with metric_col3:
+    st.metric("Focal Board (60')", f"{focal_board:.1f}")
+with metric_col4:
+    st.metric("Launch Angle", f"{launch_angle:.2f}°")
