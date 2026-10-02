@@ -1,7 +1,7 @@
 import math
 import streamlit as st
 
-# Page Configuration
+# Page Configuration - Wide Layout for Full Screen Width
 st.set_page_config(
     page_title="3-Point Targeting",
     page_icon="🎳",
@@ -13,9 +13,11 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    /* Style container cards */
     [data-testid="stForm"], [data-testid="stVerticalBlock"] > div > div[data-testid="stBlock"] {
         border-radius: 12px;
     }
+    /* Compact headers */
     h3 {
         margin-top: 0rem !important;
         padding-bottom: 0.25rem !important;
@@ -36,7 +38,7 @@ if "breakpoint_dist" not in st.session_state:
 if "slide_foot_offset" not in st.session_state:
     st.session_state.slide_foot_offset = 5.0
 
-# --- INPUT CONTROLS ---
+# --- 1. INPUT CONTROLS ---
 st.subheader("Targets")
 
 with st.container(border=True):
@@ -148,7 +150,7 @@ line_current = calculate_line(current_arrow, bp_board, bp_dist, gap)
 line_move_1 = calculate_line(current_arrow + 1.0, bp_board, bp_dist, gap)
 line_move_2 = calculate_line(current_arrow + 2.0, bp_board, bp_dist, gap)
 
-# --- RESULTS DISPLAY ---
+# --- 2. RESULTS DISPLAY ---
 st.subheader("Trajectory & Moves")
 
 col_curr, col_m1, col_m2 = st.columns(3)
@@ -180,8 +182,14 @@ with col_m2:
         st.caption(f"🎯 **Target:** {line_move_2['landmark']}")
         st.metric("Launch Angle", f"{line_move_2['angle']:.2f}°")
 
-# --- REFERENCE IMAGE EXPANDER ---
+# --- 3. REFERENCE DIAGRAM EXPANDER ---
 st.write("")
 with st.expander("📸 **View Pin Deck Focal Board Diagram**", expanded=False):
-    # Save your reference image as 'focal_map.jpg' or 'focal_map.png' in the same folder
-    st.image("focal_map.jpg", caption="Quiet Eye / 3-Point Targeting Focal Landmarks at 60 Feet", use_container_width=True)
+    try:
+        st.image(
+            "focal_map.png",
+            caption="Quiet Eye / 3-Point Targeting Focal Board Locations at 60 Feet",
+            use_container_width=True,
+        )
+    except Exception:
+        st.error("Could not find 'focal_map.png' in the root directory. Please check file path on GitHub.")
