@@ -160,7 +160,7 @@ with col_curr:
         st.markdown("### Current Line")
         st.metric("Slide Board", f"{line_current['slide']:.1f}")
         st.metric("Arrow Board", f"{line_current['arrow']:.0f}")
-        st.metric("Foul Line / Laydown", f"{line_current['laydown']:.1f}")
+        st.metric("Foul Line", f"{line_current['laydown']:.1f}")
         st.metric("Focal Board (60')", f"{line_current['focal']:.1f}")
         st.metric("Launch Angle", f"{line_current['angle']:.2f}°")
 
@@ -169,7 +169,7 @@ with col_m1:
         st.markdown("### Move +1 Left")
         st.metric("Slide Board", f"{line_move_1['slide']:.1f}")
         st.metric("Arrow Board", f"{line_move_1['arrow']:.0f}")
-        st.metric("Foul Line / Laydown", f"{line_move_1['laydown']:.1f}")
+        st.metric("Foul Line", f"{line_move_1['laydown']:.1f}")
         st.metric("Focal Board (60')", f"{line_move_1['focal']:.1f}")
         st.metric("Launch Angle", f"{line_move_1['angle']:.2f}°")
 
@@ -178,7 +178,7 @@ with col_m2:
         st.markdown("### Move +2 Left")
         st.metric("Slide Board", f"{line_move_2['slide']:.1f}")
         st.metric("Arrow Board", f"{line_move_2['arrow']:.0f}")
-        st.metric("Foul Line / Laydown", f"{line_move_2['laydown']:.1f}")
+        st.metric("Foul Line", f"{line_move_2['laydown']:.1f}")
         st.metric("Focal Board (60')", f"{line_move_2['focal']:.1f}")
         st.metric("Launch Angle", f"{line_move_2['angle']:.2f}°")
 
