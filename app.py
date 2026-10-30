@@ -30,11 +30,11 @@ st.markdown(
 
 # --- DEFAULT VALUES / SESSION STATE INITIALIZATION ---
 if "arrow_target" not in st.session_state:
-    st.session_state.arrow_target = 13.0
+    st.session_state.arrow_target = 15.0
 if "breakpoint_board" not in st.session_state:
-    st.session_state.breakpoint_board = 8.0
+    st.session_state.breakpoint_board = 5.0
 if "breakpoint_dist" not in st.session_state:
-    st.session_state.breakpoint_dist = 42.0
+    st.session_state.breakpoint_dist = 45.0
 if "slide_foot_offset" not in st.session_state:
     st.session_state.slide_foot_offset = 5.0
 
@@ -74,11 +74,11 @@ with st.container(border=True):
 
         st.slider(
             "Slide / Laydown Gap (Boards)",
-            min_value=3.0,
+            min_value=0.0,
             max_value=7.0,
             step=1.0,
             key="slide_foot_offset",
-            help="Distance from inside of sliding foot to ball laydown (Standard is 5 boards).",
+            help="Distance from inside of sliding foot to ball laydown.",
         )
 
 # --- PIN REFERENCE HELPER ---
