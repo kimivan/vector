@@ -38,47 +38,7 @@ if "breakpoint_dist" not in st.session_state:
 if "slide_foot_offset" not in st.session_state:
     st.session_state.slide_foot_offset = 5.0
 
-# --- PRESET SELECTION CALLBACK ---
-def apply_preset():
-    preset = st.session_state.preset_selection
-    if preset == "Fresh House Benchmark (15 → BP5 @ 45')":
-        st.session_state.arrow_target = 15.0
-        st.session_state.breakpoint_board = 5.0
-        st.session_state.breakpoint_dist = 45.0
-    elif preset == "Outside Friction Line (13 → BP5 @ 45')":
-        st.session_state.arrow_target = 13.0
-        st.session_state.breakpoint_board = 5.0
-        st.session_state.breakpoint_dist = 45.0
-    elif preset == "First Transition Inside (17 → BP5 @ 45')":
-        st.session_state.arrow_target = 17.0
-        st.session_state.breakpoint_board = 5.0
-        st.session_state.breakpoint_dist = 45.0
-    elif preset == "Deep Inside Swing Line (19 → BP5 @ 45')":
-        st.session_state.arrow_target = 19.0
-        st.session_state.breakpoint_board = 5.0
-        st.session_state.breakpoint_dist = 45.0
-    elif preset == "Heavy Oil / Major Breakdown (21 → BP5 @ 45')":
-        st.session_state.arrow_target = 21.0
-        st.session_state.breakpoint_board = 5.0
-        st.session_state.breakpoint_dist = 45.0
-
-# --- 1. QUICK PRESETS & INPUT CONTROLS ---
-st.subheader("Quick Presets")
-st.selectbox(
-    "Select a Common Benchmark Line:",
-    options=[
-        "Custom Inputs",
-        "Fresh House Benchmark (15 → BP5 @ 45')",
-        "Outside Friction Line (13 → BP5 @ 45')",
-        "First Transition Inside (17 → BP5 @ 45')",
-        "Deep Inside Swing Line (19 → BP5 @ 45')",
-        "Heavy Oil / Major Breakdown (21 → BP5 @ 45')",
-    ],
-    key="preset_selection",
-    on_change=apply_preset,
-    help="Selecting a preset instantly sets your arrow target, breakpoint, and distance.",
-)
-
+# --- 1. INPUT CONTROLS ---
 st.subheader("Targets")
 
 with st.container(border=True):
@@ -141,4 +101,95 @@ def get_focal_description(board):
     elif 8.5 <= b < 9.5:
         return "6-Pin Center (9)"
     elif 7.5 <= b < 8.5:
-        return "6-Pin Right
+        return "6-Pin Right Base (8)"
+    elif 6.5 <= b < 7.5:
+        return "10-Pin Left Edge (7)"
+    elif 5.5 <= b < 6.5:
+        return "10-Pin Left Shoulder (6)"
+    elif 4.5 <= b < 5.5:
+        return "10-Pin Base Left (5)"
+    elif 3.5 <= b < 4.5:
+        return "10-Pin Center (4)"
+    elif 2.5 <= b < 3.5:
+        return "10-Pin Base Right (3)"
+    elif 1.5 <= b < 2.5:
+        return "10-Pin Right Shoulder (2)"
+    else:
+        return "Gutter (< 2)"
+
+# --- CALCULATION FUNCTION ---
+def calculate_line(arrow_board, break_board, break_dist, slide_gap):
+    board_delta = arrow_board - break_board
+    dist_delta = break_dist - 15.0
+    
+    foul_line_offset = (board_delta / dist_delta) * 15.0
+    laydown_board = arrow_board + foul_line_offset
+    slide_board = laydown_board + slide_gap
+    
+    focal_board = laydown_board + ((break_board - laydown_board) / break_dist) * 60.0
+    
+    board_width_ft = 0.0889
+    board_diff_ft = (break_board - laydown_board) * board_width_ft
+    launch_angle = math.degrees(math.atan(board_diff_ft / break_dist))
+    
+    return {
+        "slide": slide_board,
+        "arrow": arrow_board,
+        "laydown": laydown_board,
+        "focal": focal_board,
+        "angle": launch_angle
+    }
+
+# Compute 3 lines
+current_arrow = st.session_state.arrow_target
+bp_board = st.session_state.breakpoint_board
+bp_dist = st.session_state.breakpoint_dist
+gap = st.session_state.slide_foot_offset
+
+line_current = calculate_line(current_arrow, bp_board, bp_dist, gap)
+line_move_1 = calculate_line(current_arrow + 1.0, bp_board, bp_dist, gap)
+line_move_2 = calculate_line(current_arrow + 2.0, bp_board, bp_dist, gap)
+
+# --- 2. RESULTS DISPLAY ---
+st.subheader("Trajectory & Moves")
+
+col_curr, col_m1, col_m2 = st.columns(3)
+
+with col_curr:
+    with st.container(border=True):
+        st.markdown("### Current Line")
+        st.metric("Slide Board", f"{line_current['slide']:.1f}")
+        st.metric("Arrow Board", f"{line_current['arrow']:.0f}")
+        st.metric("Foul Line", f"{line_current['laydown']:.1f}")
+        st.metric("Focal Board (60')", f"{line_current['focal']:.1f}")
+        st.metric("Launch Angle", f"{line_current['angle']:.2f}°")
+
+with col_m1:
+    with st.container(border=True):
+        st.markdown("### Move +1 Left")
+        st.metric("Slide Board", f"{line_move_1['slide']:.1f}")
+        st.metric("Arrow Board", f"{line_move_1['arrow']:.0f}")
+        st.metric("Foul Line", f"{line_move_1['laydown']:.1f}")
+        st.metric("Focal Board (60')", f"{line_move_1['focal']:.1f}")
+        st.metric("Launch Angle", f"{line_move_1['angle']:.2f}°")
+
+with col_m2:
+    with st.container(border=True):
+        st.markdown("### Move +2 Left")
+        st.metric("Slide Board", f"{line_move_2['slide']:.1f}")
+        st.metric("Arrow Board", f"{line_move_2['arrow']:.0f}")
+        st.metric("Foul Line", f"{line_move_2['laydown']:.1f}")
+        st.metric("Focal Board (60')", f"{line_move_2['focal']:.1f}")
+        st.metric("Launch Angle", f"{line_move_2['angle']:.2f}°")
+
+# --- 3. REFERENCE DIAGRAM EXPANDER ---
+st.write("")
+with st.expander("📸 **View Pin Deck Focal Board Diagram**", expanded=False):
+    try:
+        st.image(
+            "focal_map.png",
+            caption="Quiet Eye / 3-Point Targeting Focal Board Locations at 60 Feet",
+            use_container_width=True,
+        )
+    except Exception:
+        st.error("Could not find 'focal_map.png' in the root directory. Please check file path on GitHub.")
