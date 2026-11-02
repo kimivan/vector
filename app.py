@@ -75,7 +75,7 @@ with st.container(border=True):
         st.slider(
             "Slide / Laydown Gap (Boards)",
             min_value=0.0,
-            max_value=7.0,
+            max_value=10.0,
             step=1.0,
             key="slide_foot_offset",
             help="Distance from inside of sliding foot to ball laydown.",
